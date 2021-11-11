@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% block css %}
+    <link href="../static/our.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <form action="/plantParameters" method="POST">
+        <input type="text" placeholder="Minimum Moisture Percentage" name="moistureMin" required>
+        <input type="text" placeholder="Minimum Light Level" name="lightMin" required>
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}
