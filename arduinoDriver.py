@@ -20,31 +20,32 @@ floatFlag = False
 emailSent = False
 timestamp = 0
 pumpBool = True
+minMoistureLevel = 520
 def checkIfEmailNeeded(temp, hum, moisture, light, floatFlag, timestamp):
     currentTime = time.time()
     if(currentTime - timestamp > 86400):#86400 seconds in 24 hours
         emailSent = False
     # print(temp, hum, moisture, light, floatFlag)
     # print(f'Email sent {emailSent}')
-    # if(floatFlag == 'LOW' and not emailSent):
-    #     notifyLowWater(currentTime)
-    #     emailSent = True
-    #     timestamp = time.time()
-    # if(floatFlag == 'HIGH' and emailSent):
-    #     notifyWaterFilled(currentTime)
-    #     emailSent = False
+    if(floatFlag == 'LOW' and not emailSent):
+        notifyLowWater(currentTime)
+        emailSent = True
+        timestamp = time.time()
+    if(floatFlag == 'HIGH' and emailSent):
+        notifyWaterFilled(currentTime)
+        emailSent = False
 
 while True:
     while(board.inWaiting() == 0):
         checkIfEmailNeeded(temp, hum, moisture, light, floatFlag, timestamp)
         if pumpBool:
-            checkIfPumpNeeded(moisture, 1, board)
+            checkIfPumpNeeded(moisture, minMoistureLevel, board)
             pumpBool = False
-    output = board.readline().decode('utf-8').split(',')
+    output = board.readline().decode('utf-8').strip().split(',')
     print(output)
     temp = output[0]
     hum = output[1]
-    moisture = output[2]
+    moisture = int (output[2])
     light = output[3]
     if('LOW' in output[4]):
         floatFlag = 'LOW'
