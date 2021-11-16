@@ -1,0 +1,5 @@
+In the current directory (Root-Access), cmd line the following ->
+    docker-compose up -d
+
+To stop the containers ->
+    docker-compose stop
