@@ -102,7 +102,7 @@ def getChangePassword():
 		return renderTemplate('changePassword.html')
 
 @router.route('/changePassword', methods=["POST"])
-def postResetPassword():
+def postChangePassword():
 	global OUTSTANDINGSECRETS, CIPHER_SUITE
 	newPassword = request.form.get('pass')
 	encryptedPass = CIPHER_SUITE.encrypt(bytes(newPassword, encoding='utf-8'))
