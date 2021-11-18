@@ -1,63 +1,111 @@
 .login {
-    margin-bottom: 10px;
-    margin-left: auto;
-    margin-right: auto;
-    width: 55%;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 55%;
+}
+
+#resetButton {
+  background-color: #090;
+  color: #fff;
+  display: inline-block;
+  margin-left: 40%;
+  margin-right: 40%;
+  margin-bottom: 1em;
+  padding: 1em 0;
+  text-align: center;
+  text-decoration: none;
+  width: 20%;
 }
 
 body {
-    background-color: #eee;
-    color: #000;
-    font-size: 16px;
+  background-color: #eee;
+  color: #000;
+  font-family: Candara, Tahoma, Verdana, Arial, sans-serif;
+  font-size: 16px;
 }
 
 nav {
-    background-color: #6f3;
+  background-color: #6c3;
 }
 
 nav a {
-    color: #fff;
-    display: inline-block;
-    padding: 1em 2em;
-    text-align: right;
-    text-decoration: none;
+  color: #fff;
+  display: inline-block;
+  font-weight: bold;
+  padding: 1em 2em;
+  text-decoration: none;
 }
 
+h1 { text-align: center; }
+
 form {
-    display: block;
-    margin: 0 auto;
-    width: 50%;
+  display: block;
+  margin: 0 auto;
+  width: 50%;
 }
 
 form input {
-    display: block;
-    margin-bottom: 1em;
-    margin-left: auto;
-    margin-right: auto;
-    width: 80%;
+  display: block;
+  margin-top: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
 }
 
 form label {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 form button {
-    background-color: #090;
-    color: #fff;
-    display: inline-block;
-    margin: 0 auto;
-    padding: 1em 2em;
-    text-align: center;
-    width: 55%;
+  background-color: #090;
+  color: #fff;
+  display: inline-block;
+  margin-left: 25%;
+  margin-right: 25%;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding: 1em 2em;
+  text-align: center;
+  width: 50%;
 }
 
 @media only screen and (max-width: 1024px) {
-    form { width: 75%; }
-    form input { width: 90%; }
+  #resetButton {
+    margin-left: 35%;
+    margin-right: 35%;
+    width: 30%
+  }
+  form { width: 75%; }
+  form input { width: 90%; }
 }
 
 @media only screen and (max-width: 768px) {
-    body { font-size: 12px; }
-    form { width: 90%; }
-    form button { width: 100%; }
+  #resetButton {
+    margin-left: 30%;
+    margin-right: 30%;
+    width: 40%
+  }
+  body { font-size: 12px; }
+  form { width: 90%; }
+  form button { 
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+  }
 }
+
+nav a:link { background-color: #6c3; }
+nav a:visited { background-color: #6c3; }
+nav a:focus {
+  background-color: #9f6;
+  color: #000;
+}
+nav a:hover {
+  background-color: #9f6;
+  color: #000;
+}
+nav a:active { background-color: #390; }
+button:focus, #resetButton:focus { background-color: #3c3; }
+button:hover, #resetButton:hover { background-color: #3c3; }
+button:active, #resetButton:active { background-color: #060; }
