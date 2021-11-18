@@ -44,7 +44,7 @@ while True:
 	while(board.inWaiting() == 0):
 		checkIfEmailNeeded(temp, hum, moisture, light, floatFlag, timestamp)
 		if pumpBool:
-			checkIfPumpNeeded(moisture, minMoistureLevel, board)
+			checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
 			pumpBool = False
 		lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, None, timeDataCollected, 'endId')
 	timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
