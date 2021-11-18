@@ -1,3 +1,9 @@
+Downloading Docker ->
+    https://www.docker.com/products/docker-desktop
+    Restart PC
+    Install WSL 2 Update
+    Restart PC
+
 In the current directory (Root-Access), cmd line the following ->
     docker-compose up -d
 
