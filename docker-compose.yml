@@ -50,6 +50,8 @@ services:
         bash ./Scripts/kafka_script 
     networks:
       - apache_kafka
+    # devices:
+    #   - 'COM3:/dev/ttyUSB0'
     ports:
       - 3000:3000
     working_dir: /apache_kafka
