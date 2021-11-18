@@ -37,7 +37,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
   app:
-    image: frostcow/root-access:app-1.0.0
+    image: frostcow/root-access:app-1.0.0-arm
     container_name: app
     depends_on:
       - broker
@@ -51,7 +51,7 @@ services:
     networks:
       - apache_kafka
     # devices:
-    #   - 'COM3:/dev/ttyUSB0'
+    #   - '/dev/ttyUSB0:/dev/ttyUSB0'
     ports:
       - 3000:3000
     working_dir: /apache_kafka
@@ -77,7 +77,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
 
   connect:
-    image: frostcow/root-access:connect-1.0.0
+    image: frostcow/root-access:connect-1.0.0-arm
     hostname: connect
     container_name: connect
     restart: unless-stopped
@@ -115,7 +115,7 @@ services:
       CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components'
   
   mysql:
-    image: frostcow/root-access:db-1.0.0
+    image: frostcow/root-access:db-1.0.0-arm
     container_name: mysql
     hostname: mysql
     restart: unless-stopped
