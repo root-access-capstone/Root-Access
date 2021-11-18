@@ -37,7 +37,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
   app:
-    image: root-access/app:1.0.0
+    image: frostcow/root-access:app-1.0.0
     container_name: app
     depends_on:
       - broker
@@ -50,6 +50,8 @@ services:
         bash ./Scripts/kafka_script 
     networks:
       - apache_kafka
+    # devices:
+    #   - 'COM3:/dev/ttyUSB0'
     ports:
       - 3000:3000
     working_dir: /apache_kafka
@@ -75,7 +77,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
 
   connect:
-    image: root-access/connect:1.0.0
+    image: frostcow/root-access:connect-1.0.0
     hostname: connect
     container_name: connect
     restart: unless-stopped
@@ -86,6 +88,7 @@ services:
     depends_on:
       - broker
       - zookeeper
+      - app
     ports:
       - "8083:8083"
     entrypoint:
@@ -112,7 +115,7 @@ services:
       CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components'
   
   mysql:
-    image: root-access/db:1.0.0
+    image: frostcow/root-access:db-1.0.0
     container_name: mysql
     hostname: mysql
     restart: unless-stopped
@@ -134,4 +137,4 @@ volumes:
 
 secrets:
   connectScriptSecret:
-    file: ./Scripts/connect_script
+    file: ./container_scripts/connect_script
