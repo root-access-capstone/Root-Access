@@ -135,4 +135,4 @@ volumes:
 
 secrets:
   connectScriptSecret:
-    file: ./Scripts/connect_script
+    file: ./container_scripts/connect_script
