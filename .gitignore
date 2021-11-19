@@ -132,3 +132,7 @@ dmypy.json
 *.cfg
 Scripts/
 Include
+
+# Poetry testing
+poetry.lock
+pyproject.toml
