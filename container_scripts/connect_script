@@ -2,9 +2,9 @@
 # Launch Kafka Connect
 /etc/confluent/docker/run &
 #
-# Install mysql connector driver
-wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.27.tar.gz && \
-tar -xzvf mysql-connector-java-8.0.27.tar.gz
+# Install mariadb connector driver
+wget https://dlm.mariadb.com/1936363/connectors/c/connector-c-3.2.5/mariadb-connector-c-3.2.5-src.tar.gz && \
+tar -xzvf mariadb-connector-c-3.2.5-src.tar.gz
 # 
 # Wait for Kafka Connect listener
 echo "Waiting for Kafka Connect to start listening on localhost ⏳"
@@ -20,11 +20,11 @@ done
 curl -X POST \
   -H "Content-Type: application/json" \
     --data '{ 
-        "name": "mysql-jdbc-sink",
+        "name": "mariadb-jdbc-sink",
         "config": { 
             "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector", 
             "tasks.max": 1, 
-            "connection.url": "jdbc:mysql://mysql:3306/root_access", 
+            "connection.url": "jdbc:mariadb://mariadb:3306/root_access", 
             "connection.user": "cmst", 
             "connection.password": "agroponics",
             "topics": "sensor_data", 
