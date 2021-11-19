@@ -3,7 +3,7 @@ from flask import render_template as renderTemplate
 from flask import redirect
 from flask import request
 from flask import session
-from cryptography.fernet import Fernet
+# from cryptography.fernet import Fernet
 from uuid import uuid4
 
 from controllers.email import resetPasswordEmail
@@ -11,8 +11,8 @@ from controllers.email import resetPasswordEmail
 router = Blueprint("router", __name__)
 
 OUTSTANDINGSECRETS = []
-KEY = b'jIQ2n_UnV_YJCyUZoVhwFALM-SgkLzdnj4nCXZcw-6k='
-CIPHER_SUITE = Fernet(KEY)
+# KEY = b'jIQ2n_UnV_YJCyUZoVhwFALM-SgkLzdnj4nCXZcw-6k='
+# CIPHER_SUITE = Fernet(KEY)
 
 @router.route('/puppy')
 def puppy():
@@ -42,10 +42,10 @@ def renderHome():
 
 @router.route('/auth', methods=['POST'])
 def authUser():
-	global CIPHER_SUITE
+	# global CIPHER_SUITE
 	email = request.form.get('email')
 	password = request.form.get('pass')
-	encryptedPass = CIPHER_SUITE.encrypt(bytes(password, encoding='utf-8'))
+	# encryptedPass = CIPHER_SUITE.encrypt(bytes(password, encoding='utf-8'))
 	authorized = True
 	if authorized:
 		session['authorized'] = True
@@ -103,8 +103,8 @@ def getChangePassword():
 
 @router.route('/changePassword', methods=["POST"])
 def postChangePassword():
-	global OUTSTANDINGSECRETS, CIPHER_SUITE
+	global OUTSTANDINGSECRETS#, CIPHER_SUITE
 	newPassword = request.form.get('pass')
-	encryptedPass = CIPHER_SUITE.encrypt(bytes(newPassword, encoding='utf-8'))
+	# encryptedPass = CIPHER_SUITE.encrypt(bytes(newPassword, encoding='utf-8'))
 	# Do database stuff
 	return redirect('/')
