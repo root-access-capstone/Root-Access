@@ -136,3 +136,6 @@ Include
 # Poetry testing
 poetry.lock
 pyproject.toml
+
+# Docker
+Dockerfile.*
