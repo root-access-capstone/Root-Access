@@ -1,8 +1,8 @@
 version: '3.7'
 
 networks:
-  apache_kafka:
-    name: apache_kafka
+  root_access:
+    name: root_access
 
 services:
   zookeeper:
@@ -11,7 +11,7 @@ services:
     container_name: zookeeper
     restart: unless-stopped
     networks:
-      - apache_kafka
+      - root_access
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -22,7 +22,7 @@ services:
     container_name: broker
     restart: unless-stopped
     networks:
-      - apache_kafka
+      - root-access
     ports:
       - "9092:9092"
     depends_on:
@@ -49,12 +49,12 @@ services:
         sleep 30
         bash ./Scripts/kafka_script 
     networks:
-      - apache_kafka
+      - root_access
     # devices:
     #   - '/dev/ttyUSB0:/dev/ttyUSB0'
     ports:
       - 3000:3000
-    working_dir: /apache_kafka
+    working_dir: /root-access
     volumes:
       - .:/app
     environment:
@@ -66,7 +66,7 @@ services:
     container_name: schema-registry
     restart: unless-stopped
     networks:
-      - apache_kafka
+      - root_access
     depends_on:
      - broker
      - zookeeper
@@ -84,7 +84,7 @@ services:
     secrets:
         - connectScriptSecret
     networks:
-      - apache_kafka
+      - root_access
     depends_on:
       - broker
       - zookeeper
@@ -120,9 +120,9 @@ services:
     hostname: mysql
     restart: unless-stopped
     networks:
-     - apache_kafka
+     - root-access
     volumes:
-     - root-access:/var/lib/mysql
+     - database:/var/lib/mysql
     ports:
       - "23306:23306"
     environment:
@@ -132,8 +132,8 @@ services:
       MYSQL_DATABASE: root_access
 
 volumes:
-  root-access:
-    name: root-access
+  database:
+    name: database
 
 secrets:
   connectScriptSecret:
