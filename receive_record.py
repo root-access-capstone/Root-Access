@@ -39,7 +39,7 @@ def receive_record(args):
     while True:
         try:
             # SIGINT can't be handled when polling, limit timeout to 1 second.
-            msg = consumer.poll(10.0)
+            msg = consumer.poll(500.0)
             if msg is None:
                 print('\t---Waiting. . .')
                 continue
