@@ -22,7 +22,7 @@ services:
     container_name: broker
     restart: unless-stopped
     networks:
-      - root-access
+      - root_access
     ports:
       - "9092:9092"
     depends_on:
@@ -41,20 +41,22 @@ services:
     container_name: app
     depends_on:
       - broker
+    secrets:
+      - kafkaScriptSecret
     entrypoint:
       - bash
       - -c
       - |
         echo 'Giving broker time to start. . .'
         sleep 30
-        bash ./Scripts/kafka_script 
+        /run/secrets/kafkaScriptSecret
     networks:
       - root_access
-    # devices:
-    #   - '/dev/ttyUSB0:/dev/ttyUSB0'
+    devices:
+      - '/dev/ttyACM0:/dev/ttyACM0'
     ports:
       - 3000:3000
-    working_dir: /root-access
+    working_dir: /Root-Access
     volumes:
       - .:/app
     environment:
@@ -114,22 +116,18 @@ services:
       CONNECT_HOST: 'localhost'
       CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components'
   
-  mysql:
+  mariadb: # Port 3306
     image: frostcow/root-access:db-1.0.0-arm
-    container_name: mysql
-    hostname: mysql
+    container_name: mariadb
+    hostname: mariadb
     restart: unless-stopped
     networks:
-     - root-access
+     - root_access
     volumes:
-     - database:/var/lib/mysql
-    ports:
-      - "23306:23306"
+     - database:/var/lib/mysql # This is correct
     environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_USER: cmst
-      MYSQL_PASSWORD: agroponics
-      MYSQL_DATABASE: root_access
+      MARIADB_USER: cmst
+      MARIADB_PASSWORD: agroponics
 
 volumes:
   database:
@@ -138,3 +136,5 @@ volumes:
 secrets:
   connectScriptSecret:
     file: ./container_scripts/connect_script
+  kafkaScriptSecret:
+    file: ./container_scripts/kafka_script
