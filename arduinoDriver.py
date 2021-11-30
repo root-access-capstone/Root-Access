@@ -1,7 +1,9 @@
+# Third Party
 from datetime import datetime
 import serial
 import time
 
+# Proprietary
 from controllers.email import notifyLowWater, notifyWaterFilled
 from controllers.sendData import checkIfDataNeedsSent
 from controllers.waterPump import checkIfPumpNeeded
@@ -17,7 +19,7 @@ board = serial.Serial(
 temp = 0
 hum = 0
 moisture = 0
-light = 0
+timeLightOn = 0
 floatFlag = False
 emailSent = False
 timestamp = 0
@@ -47,7 +49,7 @@ while True:
             if pumpBool:
                 checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
                 pumpBool = False
-            lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, None, timeDataCollected, 'endId')
+            lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
     except Exception as error:
         print('**Error reading board: ', error)
 	timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
