@@ -36,6 +36,7 @@ def send_data(data:str):
     data = data.strip().split(',')
     if len(data) != 7:
         print('**Error in send_data: Insufficient data to store in the database.')
+        return 0
     else:
         handler = create_database_handler()
         # ensure_environments_table()
@@ -68,6 +69,7 @@ def send_data(data:str):
             print(result)
         except Exception as error:
             print('**Error adding to or querying database: ', error)
+        return 1
 
 if __name__ == '__main__':
     incoming = '0,2021-04-22 02:22:22,2,4,100,10,3'
