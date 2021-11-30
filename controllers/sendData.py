@@ -12,6 +12,6 @@ def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, times
     minute = now.minute
     if minute in minutesToSendOn:
         if minute != lastMinuteSent:
-            send_data(f'{envId},{timestamp},0,{hum},{moisture},{temp},0')
+            send_data(f'{envId},{timestamp},{timeLightOn},{hum},{moisture},{temp},{envId}')
             lastMinuteSent = minute
     return lastMinuteSent
