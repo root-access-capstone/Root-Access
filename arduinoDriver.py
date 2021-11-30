@@ -8,7 +8,7 @@ from controllers.waterPump import checkIfPumpNeeded
 
 
 board = serial.Serial(
-	port = 'COM3',
+	port = '/dev/ttyACM0',
 	baudrate = 115200,
 	timeout = None,
 )
@@ -41,21 +41,27 @@ def checkIfEmailNeeded(temp, hum, moisture, light, floatFlag, timestamp):
 		emailSent = False
 
 while True:
-	while(board.inWaiting() == 0):
-		checkIfEmailNeeded(temp, hum, moisture, light, floatFlag, timestamp)
-		if pumpBool:
-			checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
-			pumpBool = False
-		lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, None, timeDataCollected, 'endId')
+    try:
+        while(board.inWaiting() == 0):
+            # checkIfEmailNeeded(temp, hum, moisture, light, floatFlag, timestamp)
+            if pumpBool:
+                checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
+                pumpBool = False
+            lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, None, timeDataCollected, 'endId')
+    except Exception as error:
+        print('**Error reading board: ', error)
 	timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
 	output = board.readline().decode('utf-8').strip().split(',')
 	print(output)
-	temp = output[0]
-	hum = output[1]
-	moisture = int (output[2])
-	light = output[3]
-	if('LOW' in output[4]):
-		floatFlag = 'LOW'
-	else:
-		floatFlag = 'HIGH'
-	pumpBool = True
+    if len(output) == 5:
+        temp = output[0]
+        hum = output[1]
+        moisture = int (output[2])
+        light = output[3]
+        if('LOW' in output[4]):
+            floatFlag = 'LOW'
+        else:
+            floatFlag = 'HIGH'
+        pumpBool = True
+    else:
+        continue
