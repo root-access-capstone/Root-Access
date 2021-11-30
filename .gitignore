@@ -139,3 +139,6 @@ pyproject.toml
 
 # Docker
 Dockerfile.*
+
+# IDE preferences
+*\.vscode
