@@ -1,14 +1,57 @@
+atomicwrites @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/b7/99/9c/c8ddc18c8225c740fc2ae6d503da3f93d5dddaf04afac3da460afacbc6/atomicwrites-1.4.0-py2.py3-none-any.whl
+attrs @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/3e/94/4e/fec80f1fd57e7074be8e80b5cef7de9582de103980f17d91d476e61a4a/attrs-21.1.0-py2.py3-none-any.whl
+backports.entry-points-selectable==1.1.1
+CacheControl==0.12.10
+cachy==0.3.0
+certifi==2021.10.8
 cffi==1.15.0
+charset-normalizer==2.0.7
+cleo==0.8.1
 click==8.0.3
-colorama==0.4.4
-# cryptography==35.0.0
+clikit==0.6.2
+colorama @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/9e/b3/11/7d87ac44fdb2d557301f1f4086a37c080d1482a98751abe7cdbabbad26/colorama-0.4.4-py2.py3-none-any.whl
+crashtest==0.3.1
+cryptography==35.0.0
+distlib==0.3.3
+filelock==3.4.0
 Flask==2.0.2
 future==0.18.2
-iso8601==1.0.0
+greenlet==1.1.2
+html5lib==1.1
+idna==3.3
+iso8601 @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/e7/c7/06/1c972fc0b4b5d0324713307e1ab2ce3f79495cf6db7ec2df856dc808c2/iso8601-1.0.0-py3-none-any.whl
 itsdangerous==2.0.1
 Jinja2==3.0.3
+keyring==21.8.0
+lockfile==0.12.2
 MarkupSafe==2.0.1
+more-itertools @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/84/e3/0c/7115e6d15e77b8457bc590fb0afa20506151785fb23050ba8eeb6e9b01/more_itertools-5.0.0-py3-none-any.whl
+msgpack==1.0.2
+mysql-connector==2.2.9
+packaging==20.9
+pastel==0.2.1
+pexpect==4.8.0
+pkginfo==1.8.0
+platformdirs==2.4.0
+pluggy @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/29/58/fc/ed8b7451d3ef91a6465024f5656141da996e7aafd4d41a1659629a75e7/pluggy-0.13.1-py2.py3-none-any.whl
+poetry==1.1.11
+poetry-core==1.0.7
+ptyprocess==0.7.0
+py @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/60/79/0b/c48bd9c2a989aa8b1eb7a67cd02b053c10734f2e4e5665f7995f09999c/py-1.10.0-py2.py3-none-any.whl
 pycparser==2.21
-PyYAML==6.0
+pylev==1.4.0
+pyparsing==3.0.6
+pytest @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/c2/92/58/dde96397706a3a9a1aef9cf5754646501185b408f7f5b8012871f10115/pytest-3.10.1-py2.py3-none-any.whl
+pywin32-ctypes==0.2.0
+PyYAML @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/b9/e9/82/65a26ab81c9c52760322f10f23af03c060ce99f121aaa0422853fcef38/PyYAML-6.0-cp39-cp39-win_amd64.whl
+requests==2.26.0
+requests-toolbelt==0.9.1
 serial==0.0.97
+shellingham==1.4.0
+six==1.16.0
+SQLAlchemy==1.4.27
+tomlkit==0.7.2
+urllib3==1.26.7
+virtualenv==20.10.0
+webencodings==0.5.1
 Werkzeug==2.0.2
