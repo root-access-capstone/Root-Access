@@ -51,12 +51,12 @@ while True:
                 if pumpBool:
                     checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
                     pumpBool = False
-                lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
+                if temp != -999:
+                    lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
     except Exception as error:
         print('**Error reading board: ', error)
     timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
     output = board.readline().decode('utf-8').strip().split(',')
-    print(output)
     if len(output) == 5:
         temp = output[0]
         hum = output[1]
@@ -67,5 +67,7 @@ while True:
         else:
             floatFlag = 'HIGH'
         pumpBool = True
+        print(output)
     else:
+        print("Incomplete board output.")
         continue
