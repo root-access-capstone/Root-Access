@@ -1,7 +1,9 @@
-from datetime import datetime
-from time import time_ns
+# Proprietary
+from data_to_mysql import send_data
 
-from send_record import send_record
+# Third Party
+from datetime import datetime
+
 
 def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timestamp, envId):
 	minutesToSendOn = [0, 15, 30, 45]
@@ -9,10 +11,6 @@ def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, times
 	minute = now.minute
 	if minute in minutesToSendOn:
 		if minute != lastMinuteSent:
-			inputDict = {
-				'topic': 'sensor_data',
-				'record_value': f'{envId},{timestamp},,{hum},{moisture},{temp},'
-			}
-			send_record(inputDict)
+			send_data(f'{envId},{timestamp},0,{hum},{moisture},{temp},0')
 			lastMinuteSent = minute
 	return lastMinuteSent
