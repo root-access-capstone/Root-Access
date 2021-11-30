@@ -15,12 +15,12 @@ board = serial.Serial(
 	timeout = None,
 )
 
-# Data comes in as temperature,humidity,moisture,light,floatSensor
+# Data comes in as temperature,humidity,moisture,timeLightOn,floatSensor
 temp = 0
 hum = 0
 moisture = 0
 timeLightOn = 0
-floatFlag = False
+floatFlag = 'LOW'
 emailSent = False
 timestamp = 0
 pumpBool = True
@@ -28,38 +28,40 @@ minMoistureLevel = 520
 timeDataCollected = 0
 lastMinuteSent = 1
 envId = 0
-def checkIfEmailNeeded(temp, hum, moisture, light, floatFlag, timestamp):
-	currentTime = time.time()
-	if(currentTime - timestamp > 86400):#86400 seconds in 24 hours
-		emailSent = False
-	# print(temp, hum, moisture, light, floatFlag)
-	# print(f'Email sent {emailSent}')
-	if(floatFlag == 'LOW' and not emailSent):
-		notifyLowWater(currentTime)
-		emailSent = True
-		timestamp = time.time()
-	if(floatFlag == 'HIGH' and emailSent):
-		notifyWaterFilled(currentTime)
-		emailSent = False
+
+def checkIfEmailNeeded(floatFlag, timestamp):
+    global emailSent
+    currentTime = time.time()
+    if(currentTime - timestamp > 86400):#86400 seconds in 24 hours
+        emailSent = False
+    if(floatFlag == 'LOW' and not emailSent):
+        notifyLowWater(currentTime)
+        emailSent = True
+        timestamp = time.time()
+    if(floatFlag == 'HIGH' and emailSent):
+        notifyWaterFilled(currentTime)
+        emailSent = False
+    return timestamp
 
 while True:
     try:
         while(board.inWaiting() == 0):
-            # checkIfEmailNeeded(temp, hum, moisture, light, floatFlag, timestamp)
-            if pumpBool:
-                checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
-                pumpBool = False
-            lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
+            if temp != 0 and moisture != 0:
+                timestamp = checkIfEmailNeeded(floatFlag, timestamp)
+                if pumpBool:
+                    checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
+                    pumpBool = False
+                lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
     except Exception as error:
         print('**Error reading board: ', error)
-	timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-	output = board.readline().decode('utf-8').strip().split(',')
-	print(output)
+    timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+    output = board.readline().decode('utf-8').strip().split(',')
+    print(output)
     if len(output) == 5:
         temp = output[0]
         hum = output[1]
         moisture = int (output[2])
-        light = output[3]
+        timeLightOn = output[3]
         if('LOW' in output[4]):
             floatFlag = 'LOW'
         else:
