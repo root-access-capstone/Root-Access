@@ -34,20 +34,13 @@ void loop() {
   hum = DHT.humidity;
   moistureValue = analogRead(MOISTURE);
   lightValue = analogRead(LIGHT);
-  if(digitalRead(FLOAT_SENSOR) == LOW || lightValue > 500){
+  if(digitalRead(FLOAT_SENSOR) == LOW){
     sprintf(buffer, "%d,%d,%d,%d,HIGH,%d", temp, hum, moistureValue, lightValue, incomingByte);
     Serial.println(buffer);
   }else{
     sprintf(buffer, "%d,%d,%d,%d,LOW,%d", temp, hum, moistureValue, lightValue, incomingByte);
     Serial.println(buffer);
   }
-//  if(pumpOn){
-//    pumpOn = false;
-//    digitalWrite(PUMP, LOW);
-//  }else{
-//    pumpOn = true;
-//    digitalWrite(PUMP, HIGH);
-//  }
   
   switch(incomingByte){
     case 65:
@@ -55,6 +48,12 @@ void loop() {
       break;
     case 66:
       digitalWrite(PUMP, LOW);
+      break;
+    case 67:
+      digitalWrite(LIGHT_SWITCH, HIGH);
+      break;
+    case 68:
+      digitalWrite(LIGHT_SWITCH, LOW);
       break;
   }
   delay(2000);
