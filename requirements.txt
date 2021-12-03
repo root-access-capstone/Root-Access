@@ -1,3 +1,4 @@
+astroid==2.9.0
 atomicwrites @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/b7/99/9c/c8ddc18c8225c740fc2ae6d503da3f93d5dddaf04afac3da460afacbc6/atomicwrites-1.4.0-py2.py3-none-any.whl
 attrs @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/3e/94/4e/fec80f1fd57e7074be8e80b5cef7de9582de103980f17d91d476e61a4a/attrs-21.1.0-py2.py3-none-any.whl
 backports.entry-points-selectable==1.1.1
@@ -20,11 +21,15 @@ greenlet==1.1.2
 html5lib==1.1
 idna==3.3
 iso8601 @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/e7/c7/06/1c972fc0b4b5d0324713307e1ab2ce3f79495cf6db7ec2df856dc808c2/iso8601-1.0.0-py3-none-any.whl
+isort==5.10.1
 itsdangerous==2.0.1
 Jinja2==3.0.3
 keyring==21.8.0
+lazy-object-proxy==1.6.0
 lockfile==0.12.2
+mariadb==1.0.8
 MarkupSafe==2.0.1
+mccabe==0.6.1
 more-itertools @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/84/e3/0c/7115e6d15e77b8457bc590fb0afa20506151785fb23050ba8eeb6e9b01/more_itertools-5.0.0-py3-none-any.whl
 msgpack==1.0.2
 mysql-connector==2.2.9
@@ -40,6 +45,7 @@ ptyprocess==0.7.0
 py @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/60/79/0b/c48bd9c2a989aa8b1eb7a67cd02b053c10734f2e4e5665f7995f09999c/py-1.10.0-py2.py3-none-any.whl
 pycparser==2.21
 pylev==1.4.0
+pylint==2.12.1
 pyparsing==3.0.6
 pytest @ file:///C:/Users/gamet/AppData/Local/pypoetry/Cache/artifacts/c2/92/58/dde96397706a3a9a1aef9cf5754646501185b408f7f5b8012871f10115/pytest-3.10.1-py2.py3-none-any.whl
 pywin32-ctypes==0.2.0
@@ -50,8 +56,11 @@ serial==0.0.97
 shellingham==1.4.0
 six==1.16.0
 SQLAlchemy==1.4.27
+toml==0.10.2
 tomlkit==0.7.2
+typing_extensions==4.0.1
 urllib3==1.26.7
 virtualenv==20.10.0
 webencodings==0.5.1
 Werkzeug==2.0.2
+wrapt==1.13.3
