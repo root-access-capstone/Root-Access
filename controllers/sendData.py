@@ -2,7 +2,7 @@
 from datetime import datetime
 
 # Proprietary
-from controllers.database import Database, SensorData, new_data_object
+from database import Database, SensorData, new_data_object
 
 
 def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timestamp, envId) -> None:
