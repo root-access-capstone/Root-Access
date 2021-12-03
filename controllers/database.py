@@ -13,7 +13,7 @@ class Environments(Base):
     __tablename__ = "environments"
     envId = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     data = sqlalchemy.orm.relationship("SensorData")
-    plant = sqlalchemy.Column(sqlalchemy.String)
+    plant = sqlalchemy.Column(sqlalchemy.String(length=40))
     minMoist = sqlalchemy.Column(sqlalchemy.Integer)
 
 class SensorData(Base):
@@ -38,8 +38,8 @@ class DailyMetrics(Base):
 
 class EmailPass(Base):
     __tablename__ = "email_pass"
-    email = sqlalchemy.Column(sqlalchemy.String, primary_key=True)
-    password = sqlalchemy.Column(sqlalchemy.String)
+    email = sqlalchemy.Column(sqlalchemy.String(length=340), primary_key=True)
+    password = sqlalchemy.Column(sqlalchemy.String(length=40))
 
 class Database():
     def __init__(self):
@@ -70,9 +70,10 @@ class Database():
             print('**Error creating database Session: ', error)
         return Session
 
-    def createMetadata(self) -> None:
+    def createMetadata(self) -> None: # Change to be tested
         """Creates tables if not exists"""
         try:
+            Base.metadata.tables["environments"].create(bind=self.engine)
             Base.metadata.create_all(self.engine)
         except Exception as error:
             print('**Error creating database metadata: ', error)
