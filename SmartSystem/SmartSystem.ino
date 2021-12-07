@@ -21,6 +21,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(powerPin, OUTPUT);
   pinMode(PUMP, OUTPUT);
+  pinMode(LIGHT_SWITCH, OUTPUT);
   pinMode(FLOAT_SENSOR, INPUT_PULLUP);
   digitalWrite(powerPin, HIGH);
 }

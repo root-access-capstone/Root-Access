@@ -42,5 +42,7 @@ def checkIfPumpNeeded(moisture: int, moistureLow: int, board: serial.Serial, flo
                 return pumpStartTime, isPumpOn, False
     else:
         turnPumpOff(board)
+        if isPumpOn:
+            return pumpStartTime, False, True
         return pumpStartTime, isPumpOn, False
 
