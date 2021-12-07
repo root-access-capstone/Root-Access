@@ -3,9 +3,8 @@ class LightArray():
     def __init__(self) -> None:
         self.data = [0] * 30
 
-    def add(self, x:int):
-        assert type(x)=='int', 'Wrong datatype for light array'
-        self.data.append(x)
+    def add(self, x:str):
+        self.data.append(int(x))
         self.data.pop()
 
     def getAvg(self):
