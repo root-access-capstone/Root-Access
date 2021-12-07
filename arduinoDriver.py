@@ -8,7 +8,7 @@ from controllers.sendEmail import notifyLowWater, notifyWaterFilled
 from controllers.sendData import checkIfDataNeedsSent
 from controllers.waterPump import checkIfPumpNeeded
 from controllers.lightValue import checkIfLightNeeded
-from dataclasses.lightArray import LightArray
+from controllers.lightArray import LightArray
 
 board = serial.Serial(
     port = '/dev/ttyACM0',

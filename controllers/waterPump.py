@@ -1,4 +1,5 @@
 import serial
+from datetime import datetime
 
 def turnPumpOn(board:serial.Serial) -> None:
     """
@@ -28,12 +29,16 @@ def checkIfPumpNeeded(moisture: int, moistureLow: int, board: serial.Serial, flo
         if isPumpOn:
             if moisture < moistureLow:
                 turnPumpOn(board)
+                return (pumpStartTime, isPumpOn, False)
             else:
                 turnPumpOff(board)
+                return (pumpStartTime, False, True)
         else:
             if moisture < moistureLow:
                 turnPumpOn(board)
+                return (datetime.now(), True, False)
             else:
                 turnPumpOff(board)
+                return (pumpStartTime, isPumpOn, False)
     else:
         turnPumpOff(board)
