@@ -4,9 +4,11 @@ import serial
 import time
 
 # Proprietary
-from controllers.email import notifyLowWater, notifyWaterFilled
+from controllers.sendEmail import notifyLowWater, notifyWaterFilled
 from controllers.sendData import checkIfDataNeedsSent
 from controllers.waterPump import checkIfPumpNeeded
+from controllers.lightValue import checkIfLightNeeded
+from dataclasses.lightArray import LightArray
 
 
 board = serial.Serial(
@@ -19,7 +21,7 @@ board = serial.Serial(
 temp = 0
 hum = 0
 moisture = 0
-timeLightOn = 0
+timeLightOn = 0 # to be implemented
 floatFlag = 'LOW'
 emailSent = False
 timestamp = 0
@@ -28,6 +30,7 @@ minMoistureLevel = 520
 timeDataCollected = 0
 lastMinuteSent = 1
 envId = 0
+lightArray = LightArray()
 
 def checkIfEmailNeeded(floatFlag, timestamp):
     global emailSent
@@ -53,6 +56,7 @@ while True:
                     pumpBool = False
                 if temp != -999:
                     lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
+                checkIfLightNeeded(lightArray.getAvg(), board)
     except Exception as error:
         print('**Error reading board: ', error)
     timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
@@ -61,7 +65,7 @@ while True:
         temp = output[0]
         hum = output[1]
         moisture = int (output[2])
-        timeLightOn = output[3]
+        lightArray.add(output[3])
         if('LOW' in output[4]):
             floatFlag = 'LOW'
         else:
