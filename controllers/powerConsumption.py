@@ -1,6 +1,3 @@
-# Third Party
-from datetime import datetime, timedelta
-
 def wattsToKWH(x:int) -> int:
     """Convert watts to kilowatt hours"""
     return x/3600000
