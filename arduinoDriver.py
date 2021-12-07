@@ -10,7 +10,6 @@ from controllers.waterPump import checkIfPumpNeeded
 from controllers.lightValue import checkIfLightNeeded
 from dataclasses.lightArray import LightArray
 
-
 board = serial.Serial(
     port = '/dev/ttyACM0',
     baudrate = 115200,
@@ -21,27 +20,27 @@ board = serial.Serial(
 temp = 0
 hum = 0
 moisture = 0
-<<<<<<< HEAD
+
 lightStartOn = 0
-timeLightOn = 0 # to be implemented
+timeLightOn = 0
+isLightOn = False
+lightBool = True
+lightOn = False
+lightArray = LightArray()
+
 pumpStartOn = 0
 timePumpOn = 0
 isPumpOn = False
-isLightOn = False
-=======
->>>>>>> d1488bfb5c0ffbc464008eb97bbfdb3c10733348
+pumpBool = True
+
 floatFlag = 'LOW'
 emailSent = False
 emailTimestamp = 0
-pumpBool = True
-lightBool = True
+
 minMoistureLevel = 520
 timeDataCollected = 0
 lastMinuteSent = 1
 envId = 0
-lightArray = LightArray()
-lightOn = False
-timeLightOn = 0
 
 def checkIfEmailNeeded(floatFlag, emailTimestamp):
     global emailSent
@@ -68,7 +67,6 @@ while True:
                         timePumpOn += int((datetime.now() - pumpStartOn).strftime('%M'))
                     pumpBool = False
                 if temp != -999:
-<<<<<<< HEAD
                     temp = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
                     if temp != lastMinuteSent:
                         lastMinuteSent = temp
@@ -79,12 +77,6 @@ while True:
                     if endTime:
                         timeLightOn += int((datetime.now() - lightStartOn).strftime('%M'))
                     lightBool = False
-=======
-                    lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
-                lightOn = checkIfLightNeeded(lightArray.getAvg(), board)
-                if lightOn:
-                    timeLightOn = datetime.now()
->>>>>>> d1488bfb5c0ffbc464008eb97bbfdb3c10733348
     except Exception as error:
         print('**Error reading board: ', error)
     timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
