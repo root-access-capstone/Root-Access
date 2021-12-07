@@ -84,17 +84,19 @@ def new_data_object(data:str) -> SensorData:
     dataObject = None
     try:
         data = data.strip().split(',')
-        if len(data) != 7:
+        if len(data) != 8:
             print('Error in new_data_object: Insufficient data to store in the database')
             return 0
         dataObject = SensorData(
             envId = data[0],
             whenCollected = data[1],
             timeLightOnMins = data[2],
-            humidity = data[3],
-            soilMoisture = data[4],
-            temperature = data[5],
-            waterConsumption = data[6])
+            waterConsumption = data[3],
+            powerConsumptionKwh = data[4],
+            humidity = data[5],
+            soilMoisture = data[6],
+            temperature = data[7],
+            )
     except Exception as error:
         print('**Error creating new SensorData object: ', error)
     return dataObject
