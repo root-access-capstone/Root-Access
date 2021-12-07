@@ -22,10 +22,11 @@ class SensorData(Base):
     envId = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('environments.envId'))
     whenCollected = sqlalchemy.Column(sqlalchemy.DateTime)
     timeLightOnMins = sqlalchemy.Column(sqlalchemy.Integer)
+    waterConsumption = sqlalchemy.Column(sqlalchemy.Integer)
+    powerConsumptionKwh = sqlalchemy.Column(sqlalchemy.Integer)
     humidity = sqlalchemy.Column(sqlalchemy.Integer)
     soilMoisture = sqlalchemy.Column(sqlalchemy.Integer)
     temperature = sqlalchemy.Column(sqlalchemy.Integer)
-    waterConsumption = sqlalchemy.Column(sqlalchemy.Integer)
 
 class DailyMetrics(Base):
     __tablename__ = "daily_metrics"
