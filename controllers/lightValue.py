@@ -28,14 +28,14 @@ def checkIfLightNeeded(board:serial.Serial, avg:int, lightStartTime:int, isLight
     if isLightOn:
         if avg <= 100:
             turnLightOn(board)
-            return (lightStartTime, isLightOn, False)
+            return lightStartTime, isLightOn, False
         else:
             turnLightOff(board)
-            return (lightStartTime, False, True)
+            return lightStartTime, False, True
     else:
         if avg <= 100:
             turnLightOn(board)
-            return (datetime.now(), True, False)
+            return datetime.now(), True, False
         else:
             turnLightOff(board)
-            return (lightStartTime, isLightOn, False)
+            return lightStartTime, isLightOn, False

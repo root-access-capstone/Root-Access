@@ -77,22 +77,22 @@ while True:
                     if endTime:
                         timeLightOn += int((datetime.now() - lightStartOn).strftime('%M'))
                     lightBool = False
+        timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+        output = board.readline().decode('utf-8').strip().split(',')
+        if len(output) == 6:
+            temp = output[0]
+            hum = output[1]
+            moisture = int (output[2])
+            lightArray.add(output[3])
+            if('LOW' in output[4]):
+                floatFlag = 'LOW'
+            else:
+                floatFlag = 'HIGH'
+            pumpBool = True
+            lightBool = True
+            print(output)
+        else:
+            print("Incomplete board output.")
+            continue
     except Exception as error:
         print('**Error reading board: ', error)
-    timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-    output = board.readline().decode('utf-8').strip().split(',')
-    if len(output) == 5:
-        temp = output[0]
-        hum = output[1]
-        moisture = int (output[2])
-        lightArray.add(output[3])
-        if('LOW' in output[4]):
-            floatFlag = 'LOW'
-        else:
-            floatFlag = 'HIGH'
-        pumpBool = True
-        lightBool = True
-        print(output)
-    else:
-        print("Incomplete board output.")
-        continue
