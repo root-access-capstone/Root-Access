@@ -12,9 +12,9 @@ from dataclasses.lightArray import LightArray
 
 
 board = serial.Serial(
-	port = '/dev/ttyACM0',
-	baudrate = 115200,
-	timeout = None,
+    port = '/dev/ttyACM0',
+    baudrate = 115200,
+    timeout = None,
 )
 
 # Data comes in as temperature,humidity,moisture,timeLightOn,floatSensor
