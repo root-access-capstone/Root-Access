@@ -1,5 +1,5 @@
 # Third Party
-from datetime import datetime
+from datetime import datetime, timedelta
 import serial
 import time
 
@@ -21,7 +21,6 @@ board = serial.Serial(
 temp = 0
 hum = 0
 moisture = 0
-timeLightOn = 0 # to be implemented
 floatFlag = 'LOW'
 emailSent = False
 emailTimestamp = 0
@@ -31,6 +30,8 @@ timeDataCollected = 0
 lastMinuteSent = 1
 envId = 0
 lightArray = LightArray()
+lightOn = False
+timeLightOn = 0
 
 def checkIfEmailNeeded(floatFlag, emailTimestamp):
     global emailSent
@@ -56,7 +57,9 @@ while True:
                     pumpBool = False
                 if temp != -999:
                     lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
-                checkIfLightNeeded(lightArray.getAvg(), board)
+                lightOn = checkIfLightNeeded(lightArray.getAvg(), board)
+                if lightOn:
+                    timeLightOn = datetime.now()
     except Exception as error:
         print('**Error reading board: ', error)
     timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
