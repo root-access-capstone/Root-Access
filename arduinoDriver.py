@@ -62,7 +62,7 @@ while True:
             if temp != 0 and moisture != 0:
                 emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
                 if pumpBool:
-                    pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
+                    pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag, pumpStartOn, isPumpOn)
                     if endTime:
                         timePumpOn += int((datetime.now() - pumpStartOn).strftime('%M'))
                     pumpBool = False
