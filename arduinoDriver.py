@@ -24,7 +24,7 @@ moisture = 0
 timeLightOn = 0 # to be implemented
 floatFlag = 'LOW'
 emailSent = False
-timestamp = 0
+emailTimestamp = 0
 pumpBool = True
 minMoistureLevel = 520
 timeDataCollected = 0
@@ -32,25 +32,25 @@ lastMinuteSent = 1
 envId = 0
 lightArray = LightArray()
 
-def checkIfEmailNeeded(floatFlag, timestamp):
+def checkIfEmailNeeded(floatFlag, emailTimestamp):
     global emailSent
     currentTime = time.time()
-    if(currentTime - timestamp > 86400):#86400 seconds in 24 hours
+    if(currentTime - emailTimestamp > 86400):#86400 seconds in 24 hours
         emailSent = False
     if(floatFlag == 'LOW' and not emailSent):
         notifyLowWater(currentTime)
         emailSent = True
-        timestamp = time.time()
+        emailTimestamp = time.time()
     if(floatFlag == 'HIGH' and emailSent):
         notifyWaterFilled(currentTime)
         emailSent = False
-    return timestamp
+    return emailTimestamp
 
 while True:
     try:
         while(board.inWaiting() == 0):
             if temp != 0 and moisture != 0:
-                timestamp = checkIfEmailNeeded(floatFlag, timestamp)
+                emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
                 if pumpBool:
                     checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
                     pumpBool = False
