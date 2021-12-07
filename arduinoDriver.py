@@ -1,14 +1,12 @@
 # Third Party
-from datetime import datetime
+from datetime import datetime, timedelta
 import serial
 import time
 
 # Proprietary
 from controllers.sendEmail import notifyLowWater, notifyWaterFilled
-from controllers.sendData import checkIfDataNeedsSent
-from controllers.waterPump import checkIfPumpNeeded
-from controllers.lightValue import checkIfLightNeeded
-from dataclasses.lightArray import LightArray
+from controllers.waterPump import turnPumpOff, turnPumpOn
+from controllers.lights import turnLightOff, turnLightOn
 
 
 board = serial.Serial(
@@ -17,61 +15,56 @@ board = serial.Serial(
     timeout = None,
 )
 
-# Data comes in as temperature,humidity,moisture,timeLightOn,floatSensor
-temp = 0
-hum = 0
-moisture = 0
-timeLightOn = 0 # to be implemented
-floatFlag = 'LOW'
+floatFlag = None
 emailSent = False
-timestamp = 0
-pumpBool = True
-minMoistureLevel = 520
-timeDataCollected = 0
-lastMinuteSent = 1
-envId = 0
-lightArray = LightArray()
+emailTimeStamp = 0
+pumpTimeStamps = [(datetime.now()+timedelta(hours=6*i)).strftime('%H:%M') for i in range(4)]
+pumpOnTime = None
+print(pumpTimeStamps)
+lightTimeStamp = datetime.now().strftime('%H:%M')
 
-def checkIfEmailNeeded(floatFlag, timestamp):
+def checkIfEmailNeeded(floatFlag, emailTimeStamp):
     global emailSent
     currentTime = time.time()
-    if(currentTime - timestamp > 86400):#86400 seconds in 24 hours
+    if(currentTime - emailTimeStamp > 86400):#86400 seconds in 24 hours
         emailSent = False
     if(floatFlag == 'LOW' and not emailSent):
         notifyLowWater(currentTime)
         emailSent = True
-        timestamp = time.time()
+        emailTimeStamp = time.time()
     if(floatFlag == 'HIGH' and emailSent):
         notifyWaterFilled(currentTime)
         emailSent = False
-    return timestamp
+    return emailTimeStamp
 
 while True:
     try:
-        while(board.inWaiting() == 0):
-            if temp != 0 and moisture != 0:
-                timestamp = checkIfEmailNeeded(floatFlag, timestamp)
-                if pumpBool:
-                    checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
-                    pumpBool = False
-                if temp != -999:
-                    lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
-                checkIfLightNeeded(lightArray.getAvg(), board)
+        while board.inWaiting() == 0:
+            emailTimeStamp = checkIfEmailNeeded(floatFlag, emailTimeStamp)
+            now = datetime.now().strftime('%H:%M')
+            earlierNow = (datetime.now()-timedelta(seconds=10)).strftime('%H:%M:%S')
+            if now == lightTimeStamp+timedelta(hours=6):
+                turnLightOff(board)
+            if lightTimeStamp == now:
+                lightOnTime = datetime.now()
+                turnLightOn(board)
+            if pumpOnTime:
+                if datetime.now()  >= pumpOnTime + timedelta(seconds=10):
+                    turnPumpOff(board)
+                    pumpOnTime = None
+            if now in pumpTimeStamps:
+                pumpOnTime = datetime.now()
+                turnPumpOn(board)
+        output = board.readline().decode('utf-8').strip().split(',')
+        if len(output) == 1:
+            if('LOW' in output[0]):
+                floatFlag = 'LOW'
+            else:
+                floatFlag = 'HIGH'
+            pumpBool = True
+            print(output)
     except Exception as error:
         print('**Error reading board: ', error)
-    timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-    output = board.readline().decode('utf-8').strip().split(',')
-    if len(output) == 5:
-        temp = output[0]
-        hum = output[1]
-        moisture = int (output[2])
-        lightArray.add(output[3])
-        if('LOW' in output[4]):
-            floatFlag = 'LOW'
-        else:
-            floatFlag = 'HIGH'
-        pumpBool = True
-        print(output)
     else:
         print("Incomplete board output.")
         continue

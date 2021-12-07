@@ -1,8 +1,6 @@
 # Third Party
 import smtplib
 import time
-import socket
-
 
 GMAILUSER = 'rootaccesplant@gmail.com'
 GMAILPASSWORD = 'rootaccess2022'
@@ -50,24 +48,3 @@ def notifyWaterFilled(currentTime):
         smtp_server.close()
     except Exception as error:
         print('**Error sending filled reservoir email: ', error)
-
-def resetPasswordEmail(email, secret):
-    ip = socket.gethostbyname(socket.gethostname())
-    redirectUrl = f'{ip}/resetPassword?email={email}ref={secret}'
-    subject = 'ROOT ACCESS: Password Reset'
-    body = f'Here\'s a link to reset your password! {redirectUrl}'
-    emailText = '''\n
-    From: %s
-    To: %s
-    Subject: %s
-
-    %s
-    '''%(GMAILUSER, EMAILLIST, subject, body)
-    try:
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp_server.ehlo()
-        smtp_server.login(GMAILUSER, GMAILPASSWORD)
-        smtp_server.sendmail(GMAILUSER, EMAILLIST, emailText)
-        smtp_server.close()
-    except Exception as error:
-        print('**Error sending reset password email: ', error)
