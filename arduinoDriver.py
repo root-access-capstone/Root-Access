@@ -1,5 +1,5 @@
 # Third Party
-from datetime import datetime, timedelta
+from datetime import datetime
 import serial
 import time
 
