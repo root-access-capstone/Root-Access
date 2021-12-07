@@ -12,20 +12,26 @@ from dataclasses.lightArray import LightArray
 
 
 board = serial.Serial(
-	port = '/dev/ttyACM0',
-	baudrate = 115200,
-	timeout = None,
+    port = '/dev/ttyACM0',
+    baudrate = 115200,
+    timeout = None,
 )
 
 # Data comes in as temperature,humidity,moisture,timeLightOn,floatSensor
 temp = 0
 hum = 0
 moisture = 0
+lightStartOn = 0
 timeLightOn = 0 # to be implemented
+pumpStartOn = 0
+timePumpOn = 0
+isPumpOn = False
+isLightOn = False
 floatFlag = 'LOW'
 emailSent = False
 emailTimestamp = 0
 pumpBool = True
+lightBool = True
 minMoistureLevel = 520
 timeDataCollected = 0
 lastMinuteSent = 1
@@ -52,11 +58,21 @@ while True:
             if temp != 0 and moisture != 0:
                 emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
                 if pumpBool:
-                    checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
+                    pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag)
+                    if endTime:
+                        timePumpOn += int((datetime.now() - pumpStartOn).strftime('%M'))
                     pumpBool = False
                 if temp != -999:
-                    lastMinuteSent = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
-                checkIfLightNeeded(lightArray.getAvg(), board)
+                    temp = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeDataCollected, envId)
+                    if temp != lastMinuteSent:
+                        lastMinuteSent = temp
+                        timeLightOn = 0
+                        timePumpOn = 0
+                if lightBool:
+                    lightStartOn, isLightOn, endTime = checkIfLightNeeded(board, lightArray.getAvg(), lightStartOn, isLightOn)
+                    if endTime:
+                        timeLightOn += int((datetime.now() - lightStartOn).strftime('%M'))
+                    lightBool = False
     except Exception as error:
         print('**Error reading board: ', error)
     timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
@@ -71,6 +87,7 @@ while True:
         else:
             floatFlag = 'HIGH'
         pumpBool = True
+        lightBool = True
         print(output)
     else:
         print("Incomplete board output.")

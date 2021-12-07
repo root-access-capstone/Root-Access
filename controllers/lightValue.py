@@ -1,4 +1,5 @@
 import serial
+from datetime import datetime
 
 def turnLightOn(board:serial.Serial) -> None:
     """
@@ -16,14 +17,25 @@ def turnLightOff(board:serial.Serial) -> None:
     """
     board.write(b'D')
 
-def checkIfLightNeeded(avg:int, board:serial.Serial) -> None:
+def checkIfLightNeeded(board:serial.Serial, avg:int, lightStartTime:int, isLightOn:bool) -> None:
     """
     Checks if the light is needed or not, then turns it
     on or off accordingly.
 
     :param avg: The average value of the LightArray
+    :param lightTurnedOn: Timestamp when the light was turned on
     """
-    if avg <= 100:
-        turnLightOn(board)
+    if isLightOn:
+        if avg <= 100:
+            turnLightOn(board)
+            return (lightStartTime, isLightOn, False)
+        else:
+            turnLightOff(board)
+            return (lightStartTime, False, True)
     else:
-        turnLightOff(board)
+        if avg <= 100:
+            turnLightOn(board)
+            return (datetime.now(), True, False)
+        else:
+            turnLightOff(board)
+            return (lightStartTime, isLightOn, False)
