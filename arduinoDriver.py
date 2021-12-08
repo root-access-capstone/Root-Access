@@ -10,6 +10,7 @@ from controllers.waterPump import checkIfPumpNeeded
 from controllers.lightValue import checkIfLightNeeded
 from controllers.lightArray import LightArray
 
+
 board = serial.Serial(
     port = '/dev/ttyACM0',
     baudrate = 115200,
@@ -40,7 +41,7 @@ emailTimestamp = 0
 minMoistureLevel = 520
 timeDataCollected = 0
 lastMinuteSent = 1
-envId = 0
+envId = 1
 
 def checkIfEmailNeeded(floatFlag, emailTimestamp):
     global emailSent
@@ -64,7 +65,7 @@ while True:
                 if pumpBool:
                     pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag, pumpStartOn, isPumpOn)
                     if endTime:
-                        timePumpOn += int((datetime.now() - pumpStartOn).strftime('%M'))
+                        timePumpOn += int((datetime.now() - pumpStartOn).total_seconds()/60)
                     pumpBool = False
                 if temp != -999:
                     temp = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timePumpOn, timeDataCollected, envId)
@@ -75,7 +76,7 @@ while True:
                 if lightBool:
                     lightStartOn, isLightOn, endTime = checkIfLightNeeded(board, lightArray.getAvg(), lightStartOn, isLightOn)
                     if endTime:
-                        timeLightOn += int((datetime.now() - lightStartOn).strftime('%M'))
+                        timeLightOn += int((datetime.now() - lightStartOn).total_seconds()/60)
                     lightBool = False
         timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         output = board.readline().decode('utf-8').strip().split(',')
