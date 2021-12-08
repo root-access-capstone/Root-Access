@@ -23,7 +23,7 @@ class SensorData(Base):
     whenCollected = sqlalchemy.Column(sqlalchemy.DateTime)
     timeLightOnMins = sqlalchemy.Column(sqlalchemy.Integer)
     waterConsumption = sqlalchemy.Column(sqlalchemy.Integer)
-    powerConsumptionKwh = sqlalchemy.Column(sqlalchemy.Integer)
+    powerConsumptionKwh = sqlalchemy.Column(sqlalchemy.Float)
     humidity = sqlalchemy.Column(sqlalchemy.Integer)
     soilMoisture = sqlalchemy.Column(sqlalchemy.Integer)
     temperature = sqlalchemy.Column(sqlalchemy.Integer)
@@ -35,7 +35,7 @@ class DailyMetrics(Base):
     dateProduced = sqlalchemy.Column(sqlalchemy.Date)
     totalWaterConsumption = sqlalchemy.Column(sqlalchemy.Integer)
     totalTimeLightOnMins = sqlalchemy.Column(sqlalchemy.Integer)
-    totalPowerConsumptionKwh = sqlalchemy.Column(sqlalchemy.Integer)
+    totalPowerConsumptionKwh = sqlalchemy.Column(sqlalchemy.Float)
 
 class EmailPass(Base):
     __tablename__ = "email_pass"
@@ -50,6 +50,7 @@ class Database():
         self.engine = self.createEngine()
         self.Session = self.createSession()
         self.createMetadata()
+        self.initializeEnvironments()
 
     def createEngine(self) -> sqlalchemy.engine:
         """Returns sqlalchemy engine for the database"""
@@ -71,13 +72,26 @@ class Database():
             print('**Error creating database Session: ', error)
         return Session
 
-    def createMetadata(self) -> None: # Change to be tested
+    def createMetadata(self) -> None:
         """Creates tables if not exists"""
         try:
-            Base.metadata.tables["environments"].create(bind=self.engine)
             Base.metadata.create_all(self.engine)
         except Exception as error:
             print('**Error creating database metadata: ', error)
+
+    def initializeEnvironments(self) -> None:
+        """Makes sure that there's an entry in the environments table for
+        the sensor_data FK"""
+        try:
+            result = self.Session.query(Environments).filter(Environments.envId==1)
+            if not result or len(result)==0:
+                env = Environments(
+                    envId = 1
+                )
+                self.Session.add(env)
+                self.Session.commit()
+        except Exception as error:
+            print('**Error initializing environments: ', error)
 
 def new_data_object(data:str) -> SensorData:
     """Returns new SensorData object from data string"""
