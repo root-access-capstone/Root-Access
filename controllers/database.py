@@ -83,13 +83,14 @@ class Database():
         """Makes sure that there's an entry in the environments table for
         the sensor_data FK"""
         try:
-            result = self.Session.query(Environments).filter(Environments.envId==1)
-            if not result or len(result)==0:
+            result = self.Session.query(Environments).filter(Environments.envId==1).first() is not None
+            if not result:
                 env = Environments(
                     envId = 1
                 )
                 self.Session.add(env)
                 self.Session.commit()
+                print('Created initial entry in environments table.')
         except Exception as error:
             print('**Error initializing environments: ', error)
 
