@@ -27,7 +27,7 @@ timeLightOn = 0
 isLightOn = False
 lightBool = True
 lightOn = False
-lightArray = LightArray()
+lightArray = LightArray(30)
 
 pumpStartOn = 0
 timePumpOn = 0

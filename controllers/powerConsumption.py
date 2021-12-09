@@ -5,10 +5,9 @@ def wattsToKWH(x:int) -> int:
 def measurePowerConsumption(pumpMinutes:int=0, lampMinutes:int=0) -> int:
     """Measures power consumption in KWH"""
     watt_usage_ref = { # Measured in Watts
-        'lamp': 13, # Actual
-        'pump': 0.85, # Actual
-        'rasp-pi': 10, # TBD
-        'arduino': 5 # TBD
+        'lamp': 14,
+        'pump': 1.85,
+        'system': 5
     }
 
     powerConsumption = 0
