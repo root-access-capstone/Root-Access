@@ -17,13 +17,12 @@ from datetime import datetime
 #     """
 #     board.write(b'B')
 
-def checkIfPumpNeeded(moisture: int, moistureHigh: int, board: serial.Serial, floatFlag:str, pumpStartTime:int, isPumpOn:bool) -> None:
+def checkIfPumpNeeded(moisture: int, moistureHigh: int, floatFlag:str, pumpStartTime:int, isPumpOn:bool) -> None:
     """
     Real simple function to check if the pump is needed or not, then turns it on or off accordingly
 
     :param moisture: The moisture level read from the sensor
     :param moistureHigh: The lowest we allow the moisture to go
-    :param board: The board from arduinoDriver
     """
     if floatFlag == 'HIGH':
         if isPumpOn:#Pump is on, keep on

@@ -6,6 +6,7 @@ import time
 # Proprietary
 from controllers.sendEmail import notifyLowWater, notifyWaterFilled
 from controllers.sendData import checkIfDataNeedsSent
+from controllers.signalArduino import determineSignalToSend
 from controllers.waterPump import checkIfPumpNeeded
 from controllers.lightValue import checkIfLightNeeded
 from controllers.lightArray import LightArray
@@ -38,7 +39,7 @@ floatFlag = 'LOW'
 emailSent = False
 emailTimestamp = 0
 
-minMoistureLevel = 450
+moistureHigh = 450
 timeDataCollected = 0
 lastMinuteSent = 1
 envId = 1
@@ -63,7 +64,7 @@ while True:
             if temp != 0 and moisture != 0:
                 emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
                 if pumpBool:
-                    pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moisture, minMoistureLevel, board, floatFlag, pumpStartOn, isPumpOn)
+                    pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moisture, moistureHigh, floatFlag, pumpStartOn, isPumpOn)
                     if endTime:
                         timePumpOn += int((datetime.now() - pumpStartOn).total_seconds()/60)
                     pumpBool = False
@@ -78,6 +79,7 @@ while True:
                     if endTime:
                         timeLightOn += int((datetime.now() - lightStartOn).total_seconds()/60)
                     lightBool = False
+                determineSignalToSend(isPumpOn, isLightOn, board)
         timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         output = board.readline().decode('utf-8').strip().split(',')
         if len(output) == 6:
