@@ -85,7 +85,7 @@ while True:
             hum = output[1]
             moisture = int (output[2])
             lightArray.add(output[3])
-            if('LOW' in output[4]):
+            if 'LOW' in output[4]:
                 floatFlag = 'LOW'
             else:
                 floatFlag = 'HIGH'

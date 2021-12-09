@@ -1,47 +1,47 @@
 import serial
 from datetime import datetime
 
-def turnPumpOn(board:serial.Serial) -> None:
-    """
-    Writes to board to turn pump on
+# def turnPumpOn(board:serial.Serial) -> None:
+#     """
+#     Writes to board to turn pump on
     
-    :param board: The board from arduinoDriver
-    """
-    board.write(b'A')
+#     :param board: The board from arduinoDriver
+#     """
+#     board.write(b'A')
 
-def turnPumpOff(board:serial.Serial) -> None:
-    """
-    Writes to board to turn pump off
+# def turnPumpOff(board:serial.Serial) -> None:
+#     """
+#     Writes to board to turn pump off
     
-    :param board: The board from arduinoDriver
-    """
-    board.write(b'B')
+#     :param board: The board from arduinoDriver
+#     """
+#     board.write(b'B')
 
-def checkIfPumpNeeded(moisture: int, moistureLow: int, board: serial.Serial, floatFlag:bool, pumpStartTime:int, isPumpOn:bool) -> None:
+def checkIfPumpNeeded(moisture: int, moistureHigh: int, board: serial.Serial, floatFlag:str, pumpStartTime:int, isPumpOn:bool) -> None:
     """
     Real simple function to check if the pump is needed or not, then turns it on or off accordingly
 
     :param moisture: The moisture level read from the sensor
-    :param moistureLow: The lowest we allow the moisture to go
+    :param moistureHigh: The lowest we allow the moisture to go
     :param board: The board from arduinoDriver
     """
     if floatFlag == 'HIGH':
-        if isPumpOn:
-            if moisture > moistureLow:
-                turnPumpOn(board)
+        if isPumpOn:#Pump is on, keep on
+            if moisture > moistureHigh:
+                # turnPumpOn(board)
                 return pumpStartTime, isPumpOn, False
-            else:
-                turnPumpOff(board)
+            else:#pump is on, turn off
+                # turnPumpOff(board)
                 return pumpStartTime, False, True
         else:
-            if moisture > moistureLow:
-                turnPumpOn(board)
+            if moisture > moistureHigh:#pump is off, turn on
+                # turnPumpOn(board)
                 return datetime.now(), True, False
             else:
-                turnPumpOff(board)
+                # turnPumpOff(board) #pump is off, keep off
                 return pumpStartTime, isPumpOn, False
     else:
-        turnPumpOff(board)
+        # turnPumpOff(board)
         if isPumpOn:
             return pumpStartTime, False, True
         else:
