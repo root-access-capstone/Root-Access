@@ -75,7 +75,7 @@ while True:
                         timeLightOn = 0
                         timePumpOn = 0
                 if lightBool:
-                    lightStartOn, isLightOn, endTime = checkIfLightNeeded(board, lightArray.getAvg(), lightStartOn, isLightOn)
+                    lightStartOn, isLightOn, endTime = checkIfLightNeeded(lightArray.getAvg(), lightStartOn, isLightOn)
                     if endTime:
                         timeLightOn += int((datetime.now() - lightStartOn).total_seconds()/60)
                     lightBool = False

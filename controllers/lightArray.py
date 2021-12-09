@@ -1,7 +1,7 @@
 class LightArray():
     """Array class for tracking average of light values"""
     def __init__(self, length:int) -> None:
-        self.data = [0] * length
+        self.data = [101] * length
 
     def add(self, x:str):
         self.data.append(int(x))

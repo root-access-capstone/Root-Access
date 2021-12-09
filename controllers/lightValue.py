@@ -1,23 +1,23 @@
 import serial
 from datetime import datetime
 
-def turnLightOn(board:serial.Serial) -> None:
-    """
-    Writes to board to turn light on
+# def turnLightOn(board:serial.Serial) -> None:
+#     """
+#     Writes to board to turn light on
 
-    :param board: The board from arduinoDriver
-    """
-    board.write(b'C')
+#     :param board: The board from arduinoDriver
+#     """
+#     board.write(b'C')
 
-def turnLightOff(board:serial.Serial) -> None:
-    """
-    Writes to board to turn light off
+# def turnLightOff(board:serial.Serial) -> None:
+#     """
+#     Writes to board to turn light off
 
-    :param board: The board from arduinoDriver
-    """
-    board.write(b'D')
+#     :param board: The board from arduinoDriver
+#     """
+#     board.write(b'D')
 
-def checkIfLightNeeded(board:serial.Serial, avg:int, lightStartTime:int, isLightOn:bool) -> None:
+def checkIfLightNeeded(avg:int, lightStartTime:int, isLightOn:bool) -> None:
     """
     Checks if the light is needed or not, then turns it
     on or off accordingly.
@@ -27,15 +27,15 @@ def checkIfLightNeeded(board:serial.Serial, avg:int, lightStartTime:int, isLight
     """
     if isLightOn:
         if avg <= 100:
-            turnLightOn(board)
+            # turnLightOn(board)
             return lightStartTime, isLightOn, False
         else:
-            turnLightOff(board)
+            # turnLightOff(board)
             return lightStartTime, False, True
     else:
         if avg <= 100:
-            turnLightOn(board)
+            # turnLightOn(board)
             return datetime.now(), True, False
         else:
-            turnLightOff(board)
+            # turnLightOff(board)
             return lightStartTime, isLightOn, False
