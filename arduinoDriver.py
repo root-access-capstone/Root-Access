@@ -68,9 +68,9 @@ while True:
                         timePumpOn += int((datetime.now() - pumpStartOn).total_seconds()/60)
                     pumpBool = False
                 if temp != -999:
-                    temp = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timePumpOn, timeDataCollected, envId)
-                    if temp != lastMinuteSent:
-                        lastMinuteSent = temp
+                    returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timePumpOn, timeDataCollected, envId)
+                    if returned != lastMinuteSent:
+                        lastMinuteSent = returned
                         timeLightOn = 0
                         timePumpOn = 0
                 if lightBool:
