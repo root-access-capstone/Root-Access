@@ -46,15 +46,19 @@ void loop() {
   switch(incomingByte){
     case 65:
       digitalWrite(PUMP, HIGH);
+      digitalWrite(LIGHT_SWITCH, HIGH);
       break;
     case 66:
       digitalWrite(PUMP, LOW);
+      digitalWrite(LIGHT_SWITCH, LOW);
       break;
     case 67:
-      digitalWrite(LIGHT_SWITCH, HIGH);
+      digitalWrite(PUMP, HIGH);
+      digitalWrite(LIGHT_SWITCH, LOW);
       break;
     case 68:
-      digitalWrite(LIGHT_SWITCH, LOW);
+      digitalWrite(PUMP, LOW);
+      digitalWrite(LIGHT_SWITCH, HIGH);
       break;
   }
   delay(2000);
