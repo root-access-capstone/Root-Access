@@ -38,7 +38,7 @@ floatFlag = 'LOW'
 emailSent = False
 emailTimestamp = 0
 
-minMoistureLevel = 520
+minMoistureLevel = 450
 timeDataCollected = 0
 lastMinuteSent = 1
 envId = 1
