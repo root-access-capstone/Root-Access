@@ -43,6 +43,7 @@ moistureHigh = 450
 timeDataCollected = 0
 lastMinuteSent = 1
 envId = 1
+signalSentBool = False
 
 def checkIfEmailNeeded(floatFlag, emailTimestamp):
     global emailSent
@@ -79,7 +80,9 @@ while True:
                     if endTime:
                         timeLightOn += int((datetime.now() - lightStartOn).total_seconds()/60)
                     lightBool = False
-                determineSignalToSend(isPumpOn, isLightOn, board)
+                if not signalSentBool:
+                    determineSignalToSend(isPumpOn, isLightOn, board)
+                    signalSentBool = True
         timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         output = board.readline().decode('utf-8').strip().split(',')
         if len(output) == 6:
@@ -93,9 +96,10 @@ while True:
                 floatFlag = 'HIGH'
             pumpBool = True
             lightBool = True
+            signalSentBool = False
             print(output)
         else:
-            print("Incomplete board output.")
+            print("Incomplete board output: ", output)
             continue
     except Exception as error:
         print('**Error reading board: ', error)
