@@ -5,7 +5,7 @@ class LightArray():
 
     def add(self, x:str):
         self.data.append(int(x))
-        self.data.pop()
+        self.data.pop(0)
 
     def getAvg(self):
         return sum(self.data)/len(self.data)
