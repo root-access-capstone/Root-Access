@@ -8,4 +8,4 @@ class DataArray():
         self.data.pop(0)
 
     def getAvg(self):
-        return sum(self.data)/len(self.data)
+        return self.data.mean()
