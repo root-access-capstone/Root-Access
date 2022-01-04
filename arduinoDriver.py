@@ -30,8 +30,6 @@ lightBool = True
 lightOn = False
 lightArray = DataArray(101, 20)
 
-moistureArray = DataArray(449, 5)
-
 pumpStartOn = 0
 timePumpOn = 0
 isPumpOn = False
@@ -42,6 +40,8 @@ emailSent = False
 emailTimestamp = 0
 
 moistureHigh = 450
+moistureArray = DataArray(moistureHigh, 5)
+
 timeDataCollected = 0
 lastMinuteSent = 1
 envId = 1
