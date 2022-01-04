@@ -9,7 +9,7 @@ from controllers.sendData import checkIfDataNeedsSent
 from controllers.signalArduino import determineSignalToSend
 from controllers.waterPump import checkIfPumpNeeded
 from controllers.lightValue import checkIfLightNeeded
-from controllers.lightArray import LightArray
+from controllers.dataArray import DataArray
 
 
 board = serial.Serial(
@@ -28,7 +28,9 @@ timeLightOn = 0
 isLightOn = False
 lightBool = True
 lightOn = False
-lightArray = LightArray(30)
+lightArray = DataArray(101, 20)
+
+moistureArray = DataArray(449, 5)
 
 pumpStartOn = 0
 timePumpOn = 0
@@ -65,12 +67,12 @@ while True:
             if temp != 0 and moisture != 0:
                 emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
                 if pumpBool:
-                    pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moisture, moistureHigh, floatFlag, pumpStartOn, isPumpOn)
+                    pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moistureArray.getAvg(), moistureHigh, floatFlag, pumpStartOn, isPumpOn)
                     if endTime:
                         timePumpOn += int((datetime.now() - pumpStartOn).total_seconds()/60)
                     pumpBool = False
                 if temp != -999:
-                    returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timePumpOn, timeDataCollected, envId)
+                    returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(), timeLightOn, timePumpOn, timeDataCollected, envId)
                     if returned != lastMinuteSent:
                         lastMinuteSent = returned
                         timeLightOn = 0
@@ -89,6 +91,7 @@ while True:
             temp = output[0]
             hum = output[1]
             moisture = int (output[2])
+            moistureArray.add(moisture)
             lightArray.add(output[3])
             if 'LOW' in output[4]:
                 floatFlag = 'LOW'
