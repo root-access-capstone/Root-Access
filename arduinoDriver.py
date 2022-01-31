@@ -10,7 +10,7 @@ from controllers.signalArduino import determineSignalToSend
 from controllers.waterPump import checkIfPumpNeeded
 from controllers.lightValue import checkIfLightNeeded
 from controllers.dataArray import DataArray
-
+from controllers.database import Database
 
 board = serial.Serial(
     port = '/dev/ttyACM0',
@@ -47,6 +47,8 @@ lastMinuteSent = 1
 envId = 1
 signalSentBool = False
 
+db = Database()
+
 def checkIfEmailNeeded(floatFlag, emailTimestamp):
     global emailSent
     currentTime = time.time()
@@ -72,7 +74,7 @@ while True:
                         timePumpOn += int((datetime.now() - pumpStartOn).total_seconds()/60)
                     pumpBool = False
                 if temp != -999:
-                    returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(), timeLightOn, timePumpOn, timeDataCollected, envId)
+                    returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(), timeLightOn, timePumpOn, timeDataCollected, envId, db)
                     if returned != lastMinuteSent:
                         lastMinuteSent = returned
                         timeLightOn = 0
