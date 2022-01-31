@@ -4,7 +4,7 @@ from datetime import datetime
 # Proprietary
 from controllers.database import Database, SensorData, new_data_object
 from controllers.powerConsumption import measurePowerConsumption
-
+from controllers.waterConsumption import measureWaterConsumption
 
 def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timePumpOn, timestamp, envId) -> None:
     """If the time is right (every 15 minutes), calls send_data"""
@@ -14,7 +14,8 @@ def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeP
     if minute in minutesToSendOn:
         if minute != lastMinuteSent:
             kwh = measurePowerConsumption(timePumpOn, timeLightOn)
-            send_data(f'{envId},{timestamp},{timeLightOn},0,{kwh},{hum},{moisture},{temp}')
+            ml = measureWaterConsumption(timePumpOn)
+            send_data(f'{envId},{timestamp},{timeLightOn},{ml},{kwh},{hum},{moisture},{temp}')
             lastMinuteSent = minute
     return lastMinuteSent
 
