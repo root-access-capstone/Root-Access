@@ -15,7 +15,7 @@ def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timeP
         if minute != lastMinuteSent:
             kwh = measurePowerConsumption(timePumpOn, timeLightOn)
             ml = measureWaterConsumption(timePumpOn)
-            send_data(f'{envId},{timestamp},{timeLightOn},{ml},{kwh},{hum},{moisture},{temp}')
+            send_data(f'{envId},{timestamp},{timeLightOn},{ml},{kwh},{hum},{moisture},{temp}', db)
             lastMinuteSent = minute
     return lastMinuteSent
 
