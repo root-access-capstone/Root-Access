@@ -10,6 +10,7 @@ DATABASE_PASS = "agroponics"
 Base = declarative_base()
 
 class Environments(Base):
+    """Schema for Environments table"""
     __tablename__ = "environments"
     envId = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     data = sqlalchemy.orm.relationship("SensorData")
@@ -17,6 +18,7 @@ class Environments(Base):
     minMoist = sqlalchemy.Column(sqlalchemy.Integer)
 
 class SensorData(Base):
+    """Schema for SensorData table"""
     __tablename__ = "sensor_data"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     envId = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('environments.envId'))
@@ -29,6 +31,7 @@ class SensorData(Base):
     temperature = sqlalchemy.Column(sqlalchemy.Integer)
 
 class DailyMetrics(Base):
+    """Schema for DailyMetrics table"""
     __tablename__ = "daily_metrics"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     envId = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('environments.envId'))
@@ -38,6 +41,7 @@ class DailyMetrics(Base):
     totalPowerConsumptionKwh = sqlalchemy.Column(sqlalchemy.Float)
 
 class EmailPass(Base):
+    """Schema for EmailPass table"""
     __tablename__ = "email_pass"
     email = sqlalchemy.Column(sqlalchemy.String(length=340), primary_key=True)
     password = sqlalchemy.Column(sqlalchemy.String(length=40))
