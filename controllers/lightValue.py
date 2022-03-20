@@ -17,13 +17,14 @@ from datetime import datetime
 #     """
 #     board.write(b'D')
 
-def checkIfLightNeeded(avg:int, lightStartTime:int, isLightOn:bool) -> None:
+def checkIfLightNeeded(avg:int, lightStartTime:int, isLightOn:bool) -> tuple:
     """
     Checks if the light is needed or not, then turns it
     on or off accordingly.
 
     :param avg: The average value of the LightArray
-    :param lightTurnedOn: Timestamp when the light was turned on
+    :param lightStartTime: Timestamp when the light was turned on
+    :param isLightOn: Flag indicating the light being on or off
     """
     if isLightOn:
         if avg <= 100:
