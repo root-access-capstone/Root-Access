@@ -17,12 +17,15 @@ from datetime import datetime
 #     """
 #     board.write(b'B')
 
-def checkIfPumpNeeded(moisture: int, moistureHigh: int, floatFlag:str, pumpStartTime:int, isPumpOn:bool) -> None:
+def checkIfPumpNeeded(moisture: int, moistureHigh: int, floatFlag:str, pumpStartTime:int, isPumpOn:bool) -> tuple:
     """
     Real simple function to check if the pump is needed or not, then turns it on or off accordingly
 
     :param moisture: The moisture level read from the sensor
     :param moistureHigh: The lowest we allow the moisture to go
+    :param floatFlag: Flag indicating if we have enough water in the reservoir
+    :param pumpStartTime: The time the pump turned on
+    :param isPumpOn: Flag indicating if the pump is on or off
     """
     if floatFlag == 'HIGH':
         if isPumpOn:#Pump is on, keep on
