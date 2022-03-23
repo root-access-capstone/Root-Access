@@ -4,15 +4,17 @@ from datetime import datetime
 # Proprietary
 from controllers.database import Database, SensorData, new_data_object
 from controllers.powerConsumption import measurePowerConsumption
+from controllers.lightValue import calculateLightTimeOn
 from controllers.waterConsumption import measureWaterConsumption
 
-def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, timeLightOn, timePumpOn, timestamp, envId, db) -> datetime.minute:
+def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, lightStartTime, timePumpOn, timestamp, envId, db) -> datetime.minute:
     """If the time is right (every 15 minutes), calls send_data"""
     minutesToSendOn = [0, 15, 30, 45]
     now = datetime.now()
     minute = now.minute
     if minute in minutesToSendOn:
         if minute != lastMinuteSent:
+			timeLightOn = calculateLightTimeOn(lightStartTime)
             kwh = measurePowerConsumption(timePumpOn, timeLightOn)
             ml = measureWaterConsumption(timePumpOn)
             send_data(f'{envId},{timestamp},{timeLightOn},{ml},{kwh},{hum},{moisture},{temp}', db)

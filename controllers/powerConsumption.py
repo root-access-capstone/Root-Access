@@ -6,7 +6,7 @@ def measurePowerConsumption(pumpMinutes:int=0, lampMinutes:int=0) -> int:
     """Measures power consumption in KWH"""
     watt_usage_ref = { # Measured in Watts
         'lamp': 14,
-        'pump': 1.85,
+        'pump': 12,
         'system': 4
     }
 
