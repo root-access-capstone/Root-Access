@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 
 
 def time_diff_to_interval_seconds(time_difference:timedelta) -> float:
-    """Converts time difference to # of seconds in the interval"""
+    """Converts time difference to # of seconds
+    in the interval"""
     seconds_p_interval = 15*60 # 900 seconds per interval
     diff_seconds = time_difference.seconds
     interval_time_in_seconds = diff_seconds % seconds_p_interval
@@ -24,57 +25,77 @@ class FloatSensor:
         self.flag = True
 
 @dataclass
-class LightFixture:
-    """Class for handling light fixture & related data"""
+class Peripheral:
+    """Class for handling control & related data of Light & Pump"""
+    name: str = "Peripheral"
     is_on: bool = False
     time_turned_on: datetime = None
     time_turned_off: datetime = None
-    duration_on: timedelta = timedelta(seconds=0)
-    critical_value: int = 100 # Value to turn the light on/off
-    def set_on(self):
+    # Value to turn the peripheral on/off
+    critical_value: int = 400
+
+    def set_on(self) -> None:
         """Sets is_on to True and saves time_turned_on"""
         if not self.is_on:
             self.is_on = True
             self.time_turned_on = datetime.now()
             self.time_turned_off = None
-            logging.debug(" Set LightFixture on at %s", self.time_turned_on)
+            logging.debug(" Set %s on at %s", self.name,
+                self.time_turned_on)
         else:
-            logging.error(" Cannot set_on LightFixture - already on")
+            logging.error(" Cannot set_on %s - already on",
+                self.name)
 
-    def set_off(self):
+    def set_off(self) -> None:
         """Sets is_on to False and saves time_turned_off"""
         if self.is_on:
             self.is_on = False
             self.time_turned_off = datetime.now()
-            logging.debug(" Set LightFixture off at %s", self.time_turned_off)
+            logging.debug(" Set %s off at %s",
+                self.name, self.time_turned_off)
         else:
-            logging.error(" Cannot set_off LightFixture - already off")
+            logging.error(" Cannot set_on %s - already off",
+                self.name)
 
-    def evaluate_need(self, light_avg:float):
-        """Evaluates if the light should be turned on, off, or stay the same"""
-        if light_avg <= self.critical_value and not self.is_on:
+    def evaluate_need(self, comparison_val:float, flag=False) -> None:
+        """Evaluates if the peripheral should be
+        turned on, off, or stay the same"""
+        if flag:
+            return
+        if comparison_val <= self.critical_value and not self.is_on:
             self.set_on()
-            logging.debug(" Evaluated to set LightFixture on for light value %s", light_avg)
-        elif light_avg > self.critical_value and self.is_on:
+            logging.debug(" Evaluated to set %s on - %s < %s",
+                self.name, comparison_val,
+                self.critical_value)
+        elif comparison_val > self.critical_value and self.is_on:
             self.set_off()
-            logging.debug(" Evaluated to set LightFixture off for light value %s", light_avg)
+            logging.debug(" Evaluated to set %s off - %s > %s",
+                self.name, comparison_val,
+                self.critical_value)
+        else:
+            logging.debug(" Evaluated to keep %s set to %s",
+                self.name, self.is_on)
 
-    def calculate_time_on(self):
-        """Calculates duration of time in seconds that LightFixture was set on"""
+    def calculate_time_on(self) -> float:
+        """Calculates & returns duration of time
+        in seconds that the peripheral was set on"""
         now = datetime.now()
+        seconds_diff = None
         # Intervals are every time we store data
         if not self.is_on and self.time_turned_off >= (now - timedelta(minutes=15)):
             # Turned off this interval
             time_difference = self.time_turned_off - self.time_turned_on
-            logging.debug(" Light turned off this interval, storing for roughly %s minutes",
-                time_difference)
-            return time_diff_to_interval_seconds(time_difference)
+            logging.debug(" %s turned off this interval, storing for roughly %s minutes",
+                self.name ,time_difference)
+            seconds_diff = time_diff_to_interval_seconds(time_difference)
         elif self.is_on:
             # On
             time_difference = now - self.time_turned_on
-            logging.debug(" Light is on this interval, storing for roughly %s minutes",
-                time_difference)
-            return time_diff_to_interval_seconds(time_difference)
+            logging.debug(" %s is on this interval, storing for roughly %s minutes",
+                self.name ,time_difference)
+            seconds_diff = time_diff_to_interval_seconds(time_difference)
         else:
-            logging.debug(" Light wasn't on this interval, storing 0 seconds")
-            return timedelta(seconds=0)
+            logging.debug(" %s wasn't on this interval, storing 0 seconds",
+                self.name)
+            seconds_diff = 0
+        return seconds_diff
