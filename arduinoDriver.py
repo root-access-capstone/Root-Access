@@ -7,10 +7,10 @@ import time
 from controllers.sendEmail import notifyLowWater, notifyWaterFilled
 from controllers.sendData import checkIfDataNeedsSent
 from controllers.signalArduino import determineSignalToSend
-from controllers.waterPump import checkIfPumpNeeded
-from controllers.lightValue import checkIfLightNeeded
 from controllers.dataArray import DataArray
 from controllers.database import Database
+
+from classes import FloatSensor, Peripheral
 
 board = serial.Serial(
     port = '/dev/ttyACM0',
@@ -23,24 +23,18 @@ temp = 0
 hum = 0
 moisture = 0
 
-lightStartOn = 0
-timeLightOn = 0
-isLightOn = False
-lightBool = True
-lightOn = False
+thrashBool = True
+
 lightArray = DataArray(101, 20)
+moistureArray = DataArray(450, 5)
 
-pumpStartOn = 0
-timePumpOn = 0
-isPumpOn = False
-pumpBool = True
+light_fixt = Peripheral(name="Light", critical_value=100)
+pump = Peripheral(name="Pump", critical_value=450)
 
-floatFlag = 'LOW'
+
+floatFlag = FloatSensor()
 emailSent = False
 emailTimestamp = 0
-
-moistureHigh = 450
-moistureArray = DataArray(moistureHigh, 5)
 
 timeDataCollected = 0
 lastMinuteSent = 1
@@ -49,16 +43,16 @@ signalSentBool = False
 
 db = Database()
 
-def checkIfEmailNeeded(floatFlag, emailTimestamp):
+def checkIfEmailNeeded(floatFlag:FloatSensor, emailTimestamp):
     global emailSent
     currentTime = time.time()
     if(currentTime - emailTimestamp > 86400):#86400 seconds in 24 hours
         emailSent = False
-    if(floatFlag == 'LOW' and not emailSent):
+    if not floatFlag.flag and not emailSent:
         notifyLowWater(currentTime)
         emailSent = True
         emailTimestamp = time.time()
-    if(floatFlag == 'HIGH' and emailSent):
+    if floatFlag.flag and emailSent:
         notifyWaterFilled(currentTime)
         emailSent = False
     return emailTimestamp
@@ -67,25 +61,20 @@ while True:
     try:
         while(board.inWaiting() == 0):
             if temp != 0 and moisture != 0:
-                emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
-                if pumpBool:
-                    pumpStartOn, isPumpOn, endTime = checkIfPumpNeeded(moistureArray.getAvg(), moistureHigh, floatFlag, pumpStartOn, isPumpOn)
-                    if endTime:
-                        timePumpOn += int((datetime.now() - pumpStartOn).total_seconds())
-                    pumpBool = False
+                # emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
                 if temp != -999:
-                    returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(), timeLightOn, timePumpOn, timeDataCollected, envId, db)
+                    returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(),
+                        light_fixt.calculate_time_on(), pump.calculate_time_on(), timeDataCollected, envId, db)
                     if returned != lastMinuteSent:
                         lastMinuteSent = returned
                         timeLightOn = 0
                         timePumpOn = 0
-                if lightBool:
-                    lightStartOn, isLightOn, endTime = checkIfLightNeeded(lightArray.getAvg(), lightStartOn, isLightOn)
-                    if endTime:
-                        timeLightOn += int((datetime.now() - lightStartOn).total_seconds()/60)
-                    lightBool = False
+                if thrashBool:
+                    light_fixt.evaluate_need(lightArray.getAvg())
+                    pump.evaluate_need(moistureArray.getAvg())
+                    thrashBool = False
                 if not signalSentBool:
-                    determineSignalToSend(isPumpOn, isLightOn, board)
+                    determineSignalToSend(pump.is_on, light_fixt.is_on, board)
                     signalSentBool = True
         timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         output = board.readline().decode('utf-8').strip().split(',')
@@ -96,11 +85,10 @@ while True:
             moistureArray.add(moisture)
             lightArray.add(output[3])
             if 'LOW' in output[4]:
-                floatFlag = 'LOW'
+                floatFlag.set_low()
             else:
-                floatFlag = 'HIGH'
-            pumpBool = True
-            lightBool = True
+                floatFlag.set_high()
+            thrashBool = True
             signalSentBool = False
             print(output)
         else:
