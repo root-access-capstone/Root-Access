@@ -70,7 +70,8 @@ while True:
                 lastMinuteSent = returned
             if thrash_flag:
                 light_fixt.evaluate_need(lightArray.getAvg())
-                pump.evaluate_need(moistureArray.getAvg())
+                pump.evaluate_need(moistureArray.getAvg(),
+                    flag=floatFlag.flag)
                 thrash_flag = False
             if not signalSentBool:
                 determineSignalToSend(pump.is_on, light_fixt.is_on, board)
