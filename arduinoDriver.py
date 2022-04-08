@@ -23,7 +23,7 @@ temp = 0
 hum = 0
 moisture = 0
 
-thrashBool = True
+thrash_flag = True
 
 lightArray = DataArray(101, 20)
 moistureArray = DataArray(450, 5)
@@ -59,23 +59,22 @@ def checkIfEmailNeeded(floatFlag:FloatSensor, emailTimestamp):
 
 while True:
     try:
-        while(board.inWaiting() == 0):
-            if temp != 0 and moisture != 0:
-                # emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
-                if temp != -999:
-                    returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(),
-                        light_fixt.calculate_time_on(), pump.calculate_time_on(), timeDataCollected, envId, db)
-                    if returned != lastMinuteSent:
-                        lastMinuteSent = returned
-                        timeLightOn = 0
-                        timePumpOn = 0
-                if thrashBool:
-                    light_fixt.evaluate_need(lightArray.getAvg())
-                    pump.evaluate_need(moistureArray.getAvg())
-                    thrashBool = False
-                if not signalSentBool:
-                    determineSignalToSend(pump.is_on, light_fixt.is_on, board)
-                    signalSentBool = True
+        while board.inWaiting() == 0:
+            if temp == 0 or temp == -999 or moisture == 0:
+                continue
+            # emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
+            returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(),
+                light_fixt.calculate_time_on(), pump.calculate_time_on(), timeDataCollected,
+                envId, db)
+            if returned != lastMinuteSent:
+                lastMinuteSent = returned
+            if thrash_flag:
+                light_fixt.evaluate_need(lightArray.getAvg())
+                pump.evaluate_need(moistureArray.getAvg())
+                thrash_flag = False
+            if not signalSentBool:
+                determineSignalToSend(pump.is_on, light_fixt.is_on, board)
+                signalSentBool = True
         timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         output = board.readline().decode('utf-8').strip().split(',')
         if len(output) == 6:
@@ -88,7 +87,7 @@ while True:
                 floatFlag.set_low()
             else:
                 floatFlag.set_high()
-            thrashBool = True
+            thrash_flag = True
             signalSentBool = False
             print(output)
         else:
