@@ -43,7 +43,7 @@ def test_calc_time_on_same_interval():
     five_mins_ago = now - timedelta(minutes=5)
     five_mins_seconds = 5 * 60
     peripheral = Peripheral(is_on=True, time_turned_on=five_mins_ago)
-    assert peripheral.new_calc(now) == five_mins_seconds
+    assert peripheral.calculate_time_on(now) == five_mins_seconds
 
 def test_calc_time_on_diff_interval():
     """Tests the Peripheral's calculate_time_on method
@@ -52,7 +52,7 @@ def test_calc_time_on_diff_interval():
     twenty_mins_ago = now - timedelta(minutes=20)
     interval_seconds = 15 * 60
     peripheral = Peripheral(is_on=True, time_turned_on=twenty_mins_ago)
-    assert peripheral.new_calc(now) == interval_seconds
+    assert peripheral.calculate_time_on(now) == interval_seconds
 
 def test_calc_time_off_same_interval():
     """Tests the Peripheral's calculate_time_on method
@@ -63,7 +63,7 @@ def test_calc_time_off_same_interval():
     two_mins_seconds = 2 * 60
     peripheral = Peripheral(is_on=False, time_turned_on=seven_mins_ago,
         time_turned_off=five_mins_ago)
-    assert peripheral.new_calc(now) == two_mins_seconds
+    assert peripheral.calculate_time_on(now) == two_mins_seconds
 
 def test_calc_time_off_diff_interval():
     """Tests the Peripheral's calculate_time_on method
@@ -74,45 +74,7 @@ def test_calc_time_off_diff_interval():
     nine_mins_seconds = 9 * 60
     peripheral = Peripheral(is_on=False, time_turned_on=twenty_mins_ago,
         time_turned_off=five_mins_ago)
-    assert peripheral.new_calc(now) == nine_mins_seconds
-
-def compare_old_calc_to_new():
-    """Compares old calculate_time_on
-    function with the new one"""
-    now = datetime(2022,4,11,9,29,56)
-    print('='*60)
-    print("Assuming that the current time is "
-        f"{now.strftime('%H:%M:%S')}, here are "
-        "the various comparisons (old = new):")
-    five_mins_ago = now - timedelta(minutes=5)
-    seven_mins_ago = now - timedelta(minutes=7)
-    twenty_mins_ago = now - timedelta(minutes=20)
-    peripheral = Peripheral(is_on=True, time_turned_on=five_mins_ago)
-    print('-'*60)
-    print("\n\tOn same interval - ",
-        f"{peripheral.calculate_time_on(now)} =",
-        f"{peripheral.new_calc(now)}")
-
-    peripheral.time_turned_on = twenty_mins_ago
-    print('-'*60)
-    print("\n\tOn different interval - ",
-        f"{peripheral.calculate_time_on(now)} =",
-        f"{peripheral.new_calc(now)}")
-
-    peripheral.is_on = False
-    peripheral.time_turned_on = seven_mins_ago
-    peripheral.time_turned_off = five_mins_ago
-    print('-'*60)
-    print("\n\tOff same interval - ",
-        f"{peripheral.calculate_time_on(now)} =",
-        f"{peripheral.new_calc(now)}")
-
-    peripheral.time_turned_on = twenty_mins_ago
-    peripheral.time_turned_off = five_mins_ago
-    print('-'*60)
-    print("\n\tOff different interval - ",
-        f"{peripheral.calculate_time_on(now)} =",
-        f"{peripheral.new_calc(now)}") # 10 mins
+    assert peripheral.calculate_time_on(now) == nine_mins_seconds
 
     # cases: (written late at night, double check)
     # 1) on in the same 15 min interval ( both // 15)
@@ -133,4 +95,3 @@ def compare_old_calc_to_new():
 # test_calc_time_on_diff_interval()
 # test_calc_time_off_same_interval()
 # test_calc_time_off_diff_interval()
-compare_old_calc_to_new()
