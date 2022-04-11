@@ -57,7 +57,7 @@ class Peripheral:
             logging.error(" Cannot set_on %s - already off",
                 self.name)
 
-    def evaluate_need(self, comparison_val:float, flag=True) -> None:
+    def light_evaluate_need(self, comparison_val:float, flag=True) -> None:
         """Evaluates if the peripheral should be
         turned on, off, or stay the same"""
         if not flag:
@@ -70,6 +70,25 @@ class Peripheral:
         elif comparison_val > self.critical_value and self.is_on:
             self.set_off()
             logging.debug(" Evaluated to set %s off - %s > %s",
+                self.name, comparison_val,
+                self.critical_value)
+        else:
+            logging.debug(" Evaluated to keep %s set to %s",
+                self.name, self.is_on)
+
+    def pump_evaluate_need(self, comparison_val:float, flag=True) -> None:
+        """Evaluates if the peripheral should be
+        turned on, off, or stay the same"""
+        if not flag:
+            return
+        if comparison_val >= self.critical_value and not self.is_on:
+            self.set_on()
+            logging.debug(" Evaluated to set %s on - %s > %s",
+                self.name, comparison_val,
+                self.critical_value)
+        elif comparison_val < self.critical_value and self.is_on:
+            self.set_off()
+            logging.debug(" Evaluated to set %s off - %s < %s",
                 self.name, comparison_val,
                 self.critical_value)
         else:
