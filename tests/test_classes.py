@@ -40,15 +40,15 @@ def test_pump_evaluate_need_below():
     """Tests the Peripheral's pump_evaluate_need method
     when it should be turned off"""
     peripheral = Peripheral(critical_value=10)
-    peripheral.pump_evaluate_need(15)
-    assert peripheral.is_on is True
+    peripheral.pump_evaluate_need(5)
+    assert peripheral.is_on is False
 
 def test_pump_evaluate_need_above():
     """Tests the Peripheral's pump_evaluate_need method
     when it should be turned off"""
     peripheral = Peripheral(critical_value=10)
-    peripheral.pump_evaluate_need(5)
-    assert peripheral.is_on is False
+    peripheral.pump_evaluate_need(15)
+    assert peripheral.is_on is True
 
 def test_calc_time_on_same_interval():
     """Tests the Peripheral's calculate_time_on method
