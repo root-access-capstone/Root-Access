@@ -96,3 +96,5 @@ while True:
             continue
     except Exception as error:
         print('**Error reading board: ', error)
+    finally:
+        determineSignalToSend(False, False, board)
