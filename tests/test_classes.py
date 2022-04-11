@@ -22,18 +22,32 @@ def test_set_off():
     assert peripheral.is_on is False
     assert peripheral.time_turned_off.strftime('%H:%M:%S') == datetime.now().strftime('%H:%M:%S')
 
-def test_evaluate_need_below():
-    """Tests the Peripheral's evaluate_need method
+def test_light_evaluate_need_below():
+    """Tests the Peripheral's light_evaluate_need method
     when it should be turned on"""
     peripheral = Peripheral(critical_value=10)
-    peripheral.evaluate_need(5)
+    peripheral.light_evaluate_need(5)
     assert peripheral.is_on is True
 
-def test_evaluate_need_above():
-    """Tests the Peripheral's evaluate_need method
+def test_light_evaluate_need_above():
+    """Tests the Peripheral's light_evaluate_need method
     when it should be turned off"""
     peripheral = Peripheral(critical_value=10)
-    peripheral.evaluate_need(15)
+    peripheral.light_evaluate_need(15)
+    assert peripheral.is_on is False
+
+def test_pump_evaluate_need_below():
+    """Tests the Peripheral's pump_evaluate_need method
+    when it should be turned off"""
+    peripheral = Peripheral(critical_value=10)
+    peripheral.pump_evaluate_need(15)
+    assert peripheral.is_on is True
+
+def test_pump_evaluate_need_above():
+    """Tests the Peripheral's pump_evaluate_need method
+    when it should be turned off"""
+    peripheral = Peripheral(critical_value=10)
+    peripheral.pump_evaluate_need(5)
     assert peripheral.is_on is False
 
 def test_calc_time_on_same_interval():
