@@ -57,10 +57,10 @@ class Peripheral:
             logging.error(" Cannot set_on %s - already off",
                 self.name)
 
-    def evaluate_need(self, comparison_val:float, flag=False) -> None:
+    def evaluate_need(self, comparison_val:float, flag=True) -> None:
         """Evaluates if the peripheral should be
         turned on, off, or stay the same"""
-        if flag:
+        if not flag:
             return
         if comparison_val <= self.critical_value and not self.is_on:
             self.set_on()
@@ -76,36 +76,14 @@ class Peripheral:
             logging.debug(" Evaluated to keep %s set to %s",
                 self.name, self.is_on)
 
-    def calculate_time_on(self, now:datetime) -> float:
+    def calculate_time_on(self, now:datetime = None) -> float:
         """Calculates & returns duration of time
         in seconds that the peripheral was set on"""
-        # now = datetime.now()
+        if not now: # for Unit Testing
+            now = datetime.now()
         seconds_diff = None
         # Intervals are every time we store data
-        if not self.is_on and self.time_turned_off >= (now - timedelta(minutes=15)):
-            # Turned off this interval
-            time_difference = self.time_turned_off - self.time_turned_on
-            logging.debug(" %s turned off this interval, storing for roughly %s minutes",
-                self.name ,time_difference)
-            seconds_diff = time_diff_to_interval_seconds(time_difference)
-        elif self.is_on:
-            # On
-            time_difference = now - self.time_turned_on
-            logging.debug(" %s is on this interval, storing for roughly %s minutes",
-                self.name ,time_difference)
-            seconds_diff = time_diff_to_interval_seconds(time_difference)
-        else:
-            logging.debug(" %s wasn't on this interval, storing 0 seconds",
-                self.name)
-            seconds_diff = 0
-        return seconds_diff
-
-    def new_calc(self, now:datetime):
-        """New time calc method in testing"""
-        # now = datetime.now()
-        seconds_diff = None
-        # Intervals are every time we store data
-        if self.is_on: # need to test w/ time_turned_off set to None
+        if self.is_on:
             if self.time_turned_on.minute//15 == now.minute//15:
                 # Turned on this interval, still on
                 time_difference = now - self.time_turned_on
