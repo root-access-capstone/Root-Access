@@ -75,23 +75,3 @@ def test_calc_time_off_diff_interval():
     peripheral = Peripheral(is_on=False, time_turned_on=twenty_mins_ago,
         time_turned_off=five_mins_ago)
     assert peripheral.calculate_time_on(now) == nine_mins_seconds
-
-    # cases: (written late at night, double check)
-    # 1) on in the same 15 min interval ( both // 15)
-    #   time = now - time_turned_on
-    #
-    # 2) different 15 min interval, still on ( both % 15)
-    #   time = now % 15 mins
-    #
-    # 3) off same interval ( both // 15)
-    #   time = time_turned_off - time_turned_on
-    #
-    # 4) off different interval ( both % 15)
-    #   time = time_turned_off % 15 mins
-    #
-    # what about when the minute is 15 but it turned on that interval...?
-
-# test_calc_time_on_same_interval()
-# test_calc_time_on_diff_interval()
-# test_calc_time_off_same_interval()
-# test_calc_time_off_diff_interval()
