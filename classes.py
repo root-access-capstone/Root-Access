@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 def time_diff_to_interval_seconds(time_difference:timedelta) -> float:
     """Converts time difference to # of seconds
     in the interval"""
-    seconds_p_interval = 15*60 # 900 seconds per interval
+    # seconds_p_interval = 15*60 # 900 seconds per interval
     diff_seconds = time_difference.seconds
-    interval_time_in_seconds = diff_seconds % seconds_p_interval
-    return interval_time_in_seconds
+    # interval_time_in_seconds = diff_seconds % seconds_p_interval
+    return diff_seconds
 
 @dataclass
 class FloatSensor:
@@ -76,10 +76,10 @@ class Peripheral:
             logging.debug(" Evaluated to keep %s set to %s",
                 self.name, self.is_on)
 
-    def calculate_time_on(self) -> float:
+    def calculate_time_on(self, now) -> float:
         """Calculates & returns duration of time
         in seconds that the peripheral was set on"""
-        now = datetime.now()
+        # now = datetime.now()
         seconds_diff = None
         # Intervals are every time we store data
         if not self.is_on and self.time_turned_off >= (now - timedelta(minutes=15)):
@@ -94,6 +94,53 @@ class Peripheral:
             logging.debug(" %s is on this interval, storing for roughly %s minutes",
                 self.name ,time_difference)
             seconds_diff = time_diff_to_interval_seconds(time_difference)
+        else:
+            logging.debug(" %s wasn't on this interval, storing 0 seconds",
+                self.name)
+            seconds_diff = 0
+        return seconds_diff
+
+    def new_calc(self, now:datetime):
+        # now = datetime.now()
+        seconds_diff = None
+        # Intervals are every time we store data
+        # logging.info("Turned on interval div: %s", self.time_turned_on.minute//15)
+        # logging.info("Now interval div: %s", now.minute//15)
+        if not self.is_on and self.time_turned_off >= (now - timedelta(minutes=15)):
+            # Turned off this interval
+            same_interval = (
+                self.time_turned_off.minute // 15== self.time_turned_on.minute // 15)
+            print(same_interval)
+            if same_interval:
+                time_difference = self.time_turned_off - self.time_turned_on
+                logging.debug(" %s turned off this interval, storing for roughly %s minutes",
+                    self.name, time_difference)
+                seconds_diff = time_diff_to_interval_seconds(time_difference)
+            else:
+                mins = self.time_turned_off.minute % 15
+                time_difference = self.time_turned_off - timedelta(minutes=mins)
+                time_difference_seconds = mins * 60
+                print(self)
+                logging.debug(" %s turned off this interval, storing for roughly %s minutes",
+                    self.name, mins)
+                seconds_diff = time_difference_seconds #time_diff_to_interval_seconds(time_difference)
+        elif self.is_on:
+            if self.time_turned_on.minute//15 == now.minute//15:
+                time_difference = now - self.time_turned_on
+                print(now,self.time_turned_on)
+                logging.debug(" %s turned on this interval, storing for roughly %s minutes",
+                    self.name ,time_difference)
+                seconds_diff = time_diff_to_interval_seconds(time_difference)
+            else: # turned on in a different interval, but still on
+                time_difference = timedelta(minutes=15)
+                logging.debug(" %s turned on in a previous interval, storing for full interval - %s minutes",
+                    self.name ,time_difference)
+                seconds_diff = time_diff_to_interval_seconds(time_difference)
+            # # On
+            # time_difference = now - self.time_turned_on
+            # logging.debug(" %s is on this interval, storing for roughly %s minutes",
+            #     self.name ,time_difference)
+            # seconds_diff = time_diff_to_interval_seconds(time_difference)
         else:
             logging.debug(" %s wasn't on this interval, storing 0 seconds",
                 self.name)
