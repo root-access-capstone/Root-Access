@@ -76,7 +76,7 @@ class Peripheral:
             logging.debug(" Evaluated to keep %s set to %s",
                 self.name, self.is_on)
 
-    def calculate_time_on(self, now) -> float:
+    def calculate_time_on(self, now:datetime) -> float:
         """Calculates & returns duration of time
         in seconds that the peripheral was set on"""
         # now = datetime.now()
@@ -101,33 +101,27 @@ class Peripheral:
         return seconds_diff
 
     def new_calc(self, now:datetime):
+        """New time calc method in testing"""
         # now = datetime.now()
         seconds_diff = None
         # Intervals are every time we store data
-        # logging.info("Turned on interval div: %s", self.time_turned_on.minute//15)
-        # logging.info("Now interval div: %s", now.minute//15)
         if not self.is_on and self.time_turned_off >= (now - timedelta(minutes=15)):
             # Turned off this interval
             same_interval = (
                 self.time_turned_off.minute // 15== self.time_turned_on.minute // 15)
-            print(same_interval)
             if same_interval:
                 time_difference = self.time_turned_off - self.time_turned_on
                 logging.debug(" %s turned off this interval, storing for roughly %s minutes",
                     self.name, time_difference)
                 seconds_diff = time_diff_to_interval_seconds(time_difference)
             else:
-                mins = self.time_turned_off.minute % 15
-                time_difference = self.time_turned_off - timedelta(minutes=mins)
-                time_difference_seconds = mins * 60
-                print(self)
+                time_difference = timedelta(minutes=self.time_turned_off.minute % 15)
                 logging.debug(" %s turned off this interval, storing for roughly %s minutes",
-                    self.name, mins)
-                seconds_diff = time_difference_seconds #time_diff_to_interval_seconds(time_difference)
+                    self.name, time_difference)
+                seconds_diff = time_diff_to_interval_seconds(time_difference)
         elif self.is_on:
             if self.time_turned_on.minute//15 == now.minute//15:
                 time_difference = now - self.time_turned_on
-                print(now,self.time_turned_on)
                 logging.debug(" %s turned on this interval, storing for roughly %s minutes",
                     self.name ,time_difference)
                 seconds_diff = time_diff_to_interval_seconds(time_difference)
@@ -136,11 +130,6 @@ class Peripheral:
                 logging.debug(" %s turned on in a previous interval, storing for full interval - %s minutes",
                     self.name ,time_difference)
                 seconds_diff = time_diff_to_interval_seconds(time_difference)
-            # # On
-            # time_difference = now - self.time_turned_on
-            # logging.debug(" %s is on this interval, storing for roughly %s minutes",
-            #     self.name ,time_difference)
-            # seconds_diff = time_diff_to_interval_seconds(time_difference)
         else:
             logging.debug(" %s wasn't on this interval, storing 0 seconds",
                 self.name)
