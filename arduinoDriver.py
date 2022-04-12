@@ -10,7 +10,7 @@ from controllers.signalArduino import determineSignalToSend
 from controllers.dataArray import DataArray
 from controllers.database import Database
 
-from classes import FloatSensor, Peripheral
+from classes import FloatSensor, Light, Pump
 
 board = serial.Serial(
     port = '/dev/ttyACM0',
@@ -28,8 +28,8 @@ thrash_flag = True
 lightArray = DataArray(101, 20)
 moistureArray = DataArray(450, 5)
 
-light_fixt = Peripheral(name="Light", critical_value=100)
-pump = Peripheral(name="Pump", critical_value=400)
+light_fixt = Light(critical_value=100)
+pump = Pump(critical_value=400)
 
 
 floatFlag = FloatSensor()
@@ -69,8 +69,8 @@ while True:
             if returned != lastMinuteSent:
                 lastMinuteSent = returned
             if thrash_flag:
-                light_fixt.light_evaluate_need(lightArray.getAvg())
-                pump.pump_evaluate_need(moistureArray.getAvg(),
+                light_fixt.evaluate_need(lightArray.getAvg())
+                pump.evaluate_need(moistureArray.getAvg(),
                     flag=floatFlag.flag)
                 thrash_flag = False
             if not signalSentBool:
