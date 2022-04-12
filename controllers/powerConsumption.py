@@ -1,10 +1,10 @@
 import logging
 
 
-def wattsToKWH(x:int) -> int:
+def wattsToKWH(value:int) -> int:
     """Convert watts to kilowatt hours"""
     seconds_per_hour = 3600
-    return (x/seconds_per_hour)/1000
+    return (value/seconds_per_hour)/1000
 
 def measurePowerConsumption(pumpSeconds:int=0, lampSeconds:int=0) -> int:
     """Measures power consumption in KWH"""
@@ -16,14 +16,14 @@ def measurePowerConsumption(pumpSeconds:int=0, lampSeconds:int=0) -> int:
 
     powerConsumption = 0
     try:
-        for k, v in watt_usage_ref.items():
-            logging.debug(" %s: %s", k, v)
-            if k == 'lamp' and lampSeconds:
-                powerConsumption += (v * (lampSeconds))
-            elif k == 'pump' and pumpSeconds:
-                powerConsumption += (v * (pumpSeconds))
-            elif k != 'lamp' and k != 'pump':
-                powerConsumption += (v * (900))
+        for key, watts in watt_usage_ref.items():
+            logging.debug(" %s: %s", key, watts)
+            if key == 'lamp' and lampSeconds:
+                powerConsumption += (watts * (lampSeconds))
+            elif key == 'pump' and pumpSeconds:
+                powerConsumption += (watts * (pumpSeconds))
+            elif key != 'lamp' and key != 'pump':
+                powerConsumption += (watts * (900))
             logging.debug(" End of loop power consumption = %s",
                 powerConsumption)
     except Exception as error:
