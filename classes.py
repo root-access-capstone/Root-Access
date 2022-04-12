@@ -1,15 +1,9 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from abc import ABC, abstractmethod
+from time import sleep
 
-
-def time_diff_to_interval_seconds(time_difference:timedelta) -> float:
-    """Converts time difference to # of seconds
-    in the interval"""
-    # seconds_p_interval = 15*60 # 900 seconds per interval
-    diff_seconds = time_difference.seconds
-    # interval_time_in_seconds = diff_seconds % seconds_p_interval
-    return diff_seconds
 
 @dataclass
 class FloatSensor:
@@ -24,78 +18,80 @@ class FloatSensor:
         """Sets the flag to True"""
         self.flag = True
 
-@dataclass
-class Peripheral:
-    """Class for handling control & related data of Light & Pump"""
-    name: str = "Peripheral"
-    is_on: bool = False
-    time_turned_on: datetime = None
-    time_turned_off: datetime = None
-    # Value to turn the peripheral on/off
-    critical_value: int = 400
+class Peripheral(ABC):
+    """Class for handling control & related data of peripherals"""
+    def __init__(self, is_on:bool = False,
+            time_turned_on:datetime = None,
+            time_turned_off:datetime = None,
+            critical_value:int = 400):
+        self._is_on = is_on
+        self._time_turned_on = time_turned_on
+        self._time_turned_off = time_turned_off
+        self._critical_value = critical_value
+
+    @property
+    @abstractmethod
+    def is_on(self) -> bool:
+        """Property for whether the peripheral is on/off"""
+
+    @property
+    @abstractmethod
+    def time_turned_on(self) -> datetime:
+        """Tracks time the peripheral was turned on"""
+
+    @property
+    @abstractmethod
+    def time_turned_off(self) -> datetime:
+        """Tracks time the peripheral was turned off"""
+
+    @property
+    @abstractmethod
+    def critical_value(self) -> int:
+        """Value we use to evaluate the need of peripheral"""
+
+    @is_on.setter
+    @abstractmethod
+    def is_on(self, value:bool):
+        """Setter for is_on"""
+        if not self._is_on is value:
+            self._is_on = value
+            logging.debug(" Set is_on = %s",
+                value)
+        else:
+            raise ValueError(f" is_on is already == {value}!")
+
+    @time_turned_on.setter
+    @abstractmethod
+    def time_turned_on(self):
+        """Setter for time_turned_on"""
+
+    @time_turned_off.setter
+    @abstractmethod
+    def time_turned_off(self):
+        """"Setter method for time_turned_off"""
+
+    @abstractmethod
+    def evaluate_need(self, comparison_val:int) -> None:
+        """Evaluates if peripheral should be on or off"""
 
     def set_on(self) -> None:
-        """Sets is_on to True and saves time_turned_on"""
+        """Edits properties for tracking when it was turned on/off"""
         if not self.is_on:
             self.is_on = True
             self.time_turned_on = datetime.now()
             self.time_turned_off = None
-            logging.debug(" Set %s on at %s", self.name,
-                self.time_turned_on)
         else:
-            logging.error(" Cannot set_on %s - already on",
-                self.name)
+            logging.error(" Cannot set_on - already on")
 
     def set_off(self) -> None:
-        """Sets is_on to False and saves time_turned_off"""
+        """Edits properties for tracking when it was turned on/off"""
         if self.is_on:
             self.is_on = False
             self.time_turned_off = datetime.now()
-            logging.debug(" Set %s off at %s",
-                self.name, self.time_turned_off)
         else:
-            logging.error(" Cannot set_on %s - already off",
-                self.name)
+            logging.error(" Cannot set_off - already off")
 
-    def light_evaluate_need(self, comparison_val:float, flag=True) -> None:
-        """Evaluates if the peripheral should be
-        turned on, off, or stay the same"""
-        if not flag:
-            return
-        if comparison_val <= self.critical_value and not self.is_on:
-            self.set_on()
-            logging.debug(" Evaluated to set %s on - %s < %s",
-                self.name, comparison_val,
-                self.critical_value)
-        elif comparison_val > self.critical_value and self.is_on:
-            self.set_off()
-            logging.debug(" Evaluated to set %s off - %s > %s",
-                self.name, comparison_val,
-                self.critical_value)
-        else:
-            logging.debug(" Evaluated to keep %s set to %s",
-                self.name, self.is_on)
-
-    def pump_evaluate_need(self, comparison_val:float, flag=True) -> None:
-        """Evaluates if the peripheral should be
-        turned on, off, or stay the same"""
-        if not flag:
-            return
-        if comparison_val >= self.critical_value and not self.is_on:
-            self.set_on()
-            logging.debug(" Evaluated to set %s on - %s > %s",
-                self.name, comparison_val,
-                self.critical_value)
-        elif comparison_val < self.critical_value and self.is_on:
-            self.set_off()
-            logging.debug(" Evaluated to set %s off - %s < %s",
-                self.name, comparison_val,
-                self.critical_value)
-        else:
-            logging.debug(" Evaluated to keep %s set to %s",
-                self.name, self.is_on)
-
-    def calculate_time_on(self, now:datetime = None) -> float:
+    def calculate_time_on(self, now:datetime = None) -> int:
         """Calculates & returns duration of time
         in seconds that the peripheral was set on"""
         if not now: # for Unit Testing
@@ -106,31 +102,147 @@ class Peripheral:
             if self.time_turned_on.minute//15 == now.minute//15:
                 # Turned on this interval, still on
                 time_difference = now - self.time_turned_on
-                logging.debug(" %s turned on this interval, storing for roughly %s minutes",
-                    self.name ,time_difference)
+                logging.debug(" Turned on this interval, storing for roughly %s minutes",
+                    time_difference)
                 seconds_diff = time_difference.seconds
             else:
                 # Turned on previous interval, still on
                 time_difference = timedelta(minutes=15)
-                logging.debug(" %s turned on in a previous interval, storing for %s minutes",
-                    self.name ,time_difference)
+                logging.debug(" Turned on in a previous interval, storing for %s minutes",
+                    time_difference)
                 seconds_diff = time_difference.seconds
         elif self.time_turned_off and self.time_turned_off >= (now - timedelta(minutes=15)):
             if self.time_turned_off.minute//15 == self.time_turned_on.minute//15:
                 # Turned on & off this interval
                 time_difference = self.time_turned_off - self.time_turned_on
-                logging.debug(" %s turned off this interval, storing for roughly %s minutes",
-                    self.name, time_difference)
+                logging.debug(" Turned off this interval, storing for roughly %s minutes",
+                    time_difference)
                 seconds_diff = time_difference.seconds
             else:
                 # Turned on in a previous interval, off this interval
                 time_difference = timedelta(minutes=self.time_turned_off.minute % 15)
-                logging.debug(" %s turned off this interval, storing for roughly %s minutes",
-                    self.name, time_difference)
+                logging.debug(" Turned off this interval, storing for roughly %s minutes",
+                    time_difference)
                 seconds_diff = time_difference.seconds
         else:
             # Off this interval and not on recently
-            logging.debug(" %s wasn't on this interval, storing 0 seconds",
-                self.name)
+            logging.debug(" Wasn't on this interval, storing 0 seconds")
             seconds_diff = 0
         return seconds_diff
+
+class Light(Peripheral):
+    """Instance of Peripheral for our grow light"""
+
+    @property
+    def is_on(self):
+        """Property for whether the Light is on/off"""
+        return self._is_on
+
+    @property
+    def time_turned_on(self):
+        """Tracks time the Light was turned on"""
+        return self._time_turned_on
+
+    @property
+    def time_turned_off(self):
+        """Tracks time the Light was turned off"""
+        return self._time_turned_off
+
+    @property
+    def critical_value(self):
+        """Value we use to evaluate the need of Light"""
+        return self._critical_value
+
+    @is_on.setter
+    def is_on(self, value:bool):
+        """Setter for is_on"""
+        if not self._is_on is value:
+            self._is_on = value
+            logging.debug(" Set is_on = %s",
+                value)
+        else:
+            raise ValueError(f" is_on is already == {value}!")
+
+    @time_turned_on.setter
+    def time_turned_on(self, time):
+        """Setter for time_turned_on"""
+        self._time_turned_on = time
+
+    @time_turned_off.setter
+    def time_turned_off(self, time):
+        """"Setter method for time_turned_off"""
+        self._time_turned_off = time
+
+    def evaluate_need(self, comparison_val:int):
+        """Evaluates if Light should be on or off"""
+        logging.debug(" Evaluating Light - %s vs %s",
+                comparison_val, self.critical_value)
+        if comparison_val <= self.critical_value and not self.is_on:
+            self.set_on()
+        elif comparison_val > self.critical_value and self.is_on:
+            self.set_off()
+        else:
+            return
+
+class Pump(Peripheral):
+    """Instance of Peripheral for our Pump"""
+
+    @property
+    def is_on(self):
+        """Property for whether the Pump is on/off"""
+        return self._is_on
+
+    @property
+    def time_turned_on(self):
+        """Tracks time the Pump was turned on"""
+        return self._time_turned_on
+
+    @property
+    def time_turned_off(self):
+        """Tracks time the Pump was turned off"""
+        return self._time_turned_off
+
+    @property
+    def critical_value(self):
+        """Value we use to evaluate the need of Pump"""
+        return self._critical_value
+
+    @is_on.setter
+    def is_on(self, value:bool):
+        """Setter for is_on"""
+        if not self._is_on is value:
+            self._is_on = value
+            logging.debug(" Set is_on = %s",
+                value)
+        else:
+            raise ValueError(f" is_on is already == {value}!")
+
+    @time_turned_on.setter
+    def time_turned_on(self, time):
+        """Setter for time_turned_on"""
+        self._time_turned_on = time
+
+    @time_turned_off.setter
+    def time_turned_off(self, time):
+        """"Setter method for time_turned_off"""
+        self._time_turned_off = time
+
+    def evaluate_need(self, comparison_val:int, flag:bool = True):
+        """Evaluates if Pump should be on or off - flag is the FloatSensor"""
+        logging.debug(" Evaluating Pump - %s vs %s",
+                comparison_val, self.critical_value)
+        if not flag:
+            return
+        if comparison_val >= self.critical_value and not self.is_on:
+            self.set_on()
+        elif comparison_val < self.critical_value and self.is_on:
+            self.set_off()
+        else:
+            return
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    per = Pump(critical_value=3)
+    for i in range(1,6):
+        sleep(2)
+        per.evaluate_need(i, True)
