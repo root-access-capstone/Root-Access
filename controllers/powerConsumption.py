@@ -1,8 +1,12 @@
+import logging
+
+
 def wattsToKWH(x:int) -> int:
     """Convert watts to kilowatt hours"""
-    return x/3600000
+    seconds_per_hour = 3600
+    return (x/seconds_per_hour)/1000
 
-def measurePowerConsumption(pumpMinutes:int=0, lampMinutes:int=0) -> int:
+def measurePowerConsumption(pumpSeconds:int=0, lampSeconds:int=0) -> int:
     """Measures power consumption in KWH"""
     watt_usage_ref = { # Measured in Watts
         'lamp': 14,
@@ -13,19 +17,23 @@ def measurePowerConsumption(pumpMinutes:int=0, lampMinutes:int=0) -> int:
     powerConsumption = 0
     try:
         for k, v in watt_usage_ref.items():
-            if k == 'lamp' and lampMinutes:
-                powerConsumption += (v * (lampMinutes*60))
-            elif k == 'pump' and pumpMinutes:
-                powerConsumption += (v * (pumpMinutes*60))
+            logging.debug(" %s: %s", k, v)
+            if k == 'lamp' and lampSeconds:
+                powerConsumption += (v * (lampSeconds))
+            elif k == 'pump' and pumpSeconds:
+                powerConsumption += (v * (pumpSeconds))
             elif k != 'lamp' and k != 'pump':
                 powerConsumption += (v * (900))
+            logging.debug(" End of loop power consumption = %s",
+                powerConsumption)
     except Exception as error:
-        print('**Error computing powerConsumption: ', error)
+        logging.error(' Error computing powerConsumption: %s',
+            error)
 
     powerConsumptionKWH = wattsToKWH(powerConsumption)
     return powerConsumptionKWH
 
 if __name__ == '__main__':
-    pc = measurePowerConsumption(lampMinutes=7)
+    pc = measurePowerConsumption(lampSeconds=60)
     assert round(pc, 6) == 0.005267, 'Incorrect power consumption output: '+str(round(pc, 6))
     print(round(pc, 6), 'kwh')
