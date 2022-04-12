@@ -130,27 +130,27 @@ class Peripheral(ABC):
             seconds_diff = 0
         return seconds_diff
 
-class Light(Peripheral):
-    """Instance of Peripheral for our grow light"""
+class Lamp(Peripheral):
+    """Instance of Peripheral for our grow lamp"""
 
     @property
     def is_on(self):
-        """Property for whether the Light is on/off"""
+        """Property for whether the Lamp is on/off"""
         return self._is_on
 
     @property
     def time_turned_on(self):
-        """Tracks time the Light was turned on"""
+        """Tracks time the Lamp was turned on"""
         return self._time_turned_on
 
     @property
     def time_turned_off(self):
-        """Tracks time the Light was turned off"""
+        """Tracks time the Lamp was turned off"""
         return self._time_turned_off
 
     @property
     def critical_value(self):
-        """Value we use to evaluate the need of Light"""
+        """Value we use to evaluate the need of Lamp"""
         return self._critical_value
 
     @is_on.setter
@@ -174,8 +174,8 @@ class Light(Peripheral):
         self._time_turned_off = time
 
     def evaluate_need(self, comparison_val:int):
-        """Evaluates if Light should be on or off"""
-        logging.debug(" Evaluating Light - %s vs %s",
+        """Evaluates if Lamp should be on or off"""
+        logging.debug(" Evaluating Lamp - %s vs %s",
                 comparison_val, self.critical_value)
         if comparison_val <= self.critical_value and not self.is_on:
             self.set_on()

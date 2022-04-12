@@ -11,7 +11,7 @@ from controllers.signalArduino import determineSignalToSend
 from controllers.dataArray import DataArray
 from controllers.database import Database
 
-from classes import FloatSensor, Light, Pump
+from classes import FloatSensor, Lamp, Pump
 
 
 logging.basicConfig(level=logging.ERROR,
@@ -35,7 +35,7 @@ thrash_flag = True
 lightArray = DataArray(101, 20)
 moistureArray = DataArray(450, 5)
 
-light_fixt = Light(critical_value=100)
+lamp = Lamp(critical_value=100)
 pump = Pump(critical_value=400)
 
 floatFlag = FloatSensor()
@@ -70,17 +70,17 @@ while True:
                 continue
             # emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
             returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(),
-                light_fixt.calculate_time_on(), pump.calculate_time_on(), timeDataCollected,
+                lamp.calculate_time_on(), pump.calculate_time_on(), timeDataCollected,
                 envId, db)
             if returned != lastMinuteSent:
                 lastMinuteSent = returned
             if thrash_flag:
-                light_fixt.evaluate_need(lightArray.getAvg())
+                lamp.evaluate_need(lightArray.getAvg())
                 pump.evaluate_need(moistureArray.getAvg(),
                     flag=floatFlag.flag)
                 thrash_flag = False
             if not signalSentBool:
-                determineSignalToSend(pump.is_on, light_fixt.is_on, board)
+                determineSignalToSend(pump.is_on, lamp.is_on, board)
                 signalSentBool = True
         timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         output = board.readline().decode('utf-8').strip().split(',')
