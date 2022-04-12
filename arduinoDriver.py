@@ -2,6 +2,7 @@
 from datetime import datetime
 import serial
 import time
+import logging
 
 # Proprietary
 from controllers.sendEmail import notifyLowWater, notifyWaterFilled
@@ -11,6 +12,12 @@ from controllers.dataArray import DataArray
 from controllers.database import Database
 
 from classes import FloatSensor, Light, Pump
+
+
+logging.basicConfig(level=logging.ERROR,
+    filemode="w",
+    filename="error_log.log",
+)
 
 board = serial.Serial(
     port = '/dev/ttyACM0',
@@ -30,7 +37,6 @@ moistureArray = DataArray(450, 5)
 
 light_fixt = Light(critical_value=100)
 pump = Pump(critical_value=400)
-
 
 floatFlag = FloatSensor()
 emailSent = False
@@ -92,9 +98,9 @@ while True:
             signalSentBool = False
             print(output)
         else:
-            print("Incomplete board output: ", output)
+            logging.error(" Incomplete board output: %s", output)
             continue
     except Exception as error:
-        print('**Error reading board: ', error)
+        logging.error(" Error reading board: %s", error)
     finally:
         determineSignalToSend(False, False, board)

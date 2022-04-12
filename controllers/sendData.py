@@ -1,23 +1,25 @@
 # Third Party
 from datetime import datetime
+import logging
 
 # Proprietary
 from controllers.database import Database, SensorData, new_data_object
 from controllers.powerConsumption import measurePowerConsumption
-from controllers.lightValue import calculateLightTimeOn
 from controllers.waterConsumption import measureWaterConsumption
 
-def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, lightStartTime, timePumpOn, timestamp, envId, db) -> datetime.minute:
+def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, lightOnTimeSecs, pumpOnTimeSecs, timestamp, envId, db) -> datetime.minute:
     """If the time is right (every 15 minutes), calls send_data"""
     minutesToSendOn = [0, 15, 30, 45]
     now = datetime.now()
     minute = now.minute
     if minute in minutesToSendOn:
         if minute != lastMinuteSent:
-            timeLightOn = calculateLightTimeOn(lightStartTime)
-            kwh = measurePowerConsumption(timePumpOn, timeLightOn)
-            ml = measureWaterConsumption(timePumpOn)
-            send_data(f'{envId},{timestamp},{timeLightOn},{ml},{kwh},{hum},{moisture},{temp}', db)
+            kwh = measurePowerConsumption(pumpOnTimeSecs, lightOnTimeSecs)
+            ml = measureWaterConsumption(pumpOnTimeSecs)
+            data = f'{envId},{timestamp},{lightOnTimeSecs},{ml},{kwh},{hum},{moisture},{temp}'
+            logging.debug(" Sending data string: \n\t%s",
+                data)
+            send_data(data, db)
             lastMinuteSent = minute
     return lastMinuteSent
 
@@ -30,11 +32,12 @@ def send_data(data:str, db:Database) -> bool:
         db.Session.commit()
         result = db.Session.query(SensorData).all()
         if result:
-            print('Stored sensor data in database.')
+            logging.info(' Stored sensor data in database.')
         else:
-            print('** Error: Failed to query database.')
+            logging.error(' Failed to query database.')
     except Exception as error:
-        print('**Error adding to or querying database: ', error)
+        logging.error(' Error adding to or querying database: %s',
+            error)
         return 0
     return 1
 

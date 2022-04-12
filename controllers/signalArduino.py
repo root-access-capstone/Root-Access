@@ -1,6 +1,6 @@
-import serial
+from serial import Serial
 
-def determineSignalToSend(isPumpOn:bool, isLightOn:bool, board:serial.Serial) -> None:
+def determineSignalToSend(isPumpOn:bool, isLightOn:bool, board:Serial) -> None:
     """Determines the signal to send to the arduino depending on which
     accessories are on or off"""
     if isPumpOn:

@@ -1,6 +1,7 @@
-def measureWaterConsumption(timePumpOn) -> int:
+def measureWaterConsumption(pumpOnTimeSecs:int) -> int:
     """
     Takes the time the pump has been on in seconds
     times the flowrate in seconds
     """
-    return timePumpOn * (100000 / 3600)
+    flowrate = 100000
+    return pumpOnTimeSecs * (flowrate / 3600)
