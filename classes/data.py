@@ -36,7 +36,8 @@ class Data:
         """Updates temperature, humidity, and moisture,
         checks their validity, and adds moisture &
         light to their DataArrays"""
-        if temperature == 0 or temperature == -999 or moisture == 0:
+        invalid_data = [0, -999]
+        if temperature in invalid_data or moisture in invalid_data:
             logging.debug(" Invalid data received: %s",
                 [temperature, humidity, moisture, light])
             self.valid = False
