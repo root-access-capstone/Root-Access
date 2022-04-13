@@ -18,8 +18,8 @@ def checkIfDataNeedsSent(lastMinuteSent, data:Data, lamp:Lamp,
     minute = now.minute
     if minute in minutesToSendOn:
         if minute != lastMinuteSent:
-            pumpOnTime = pump.calculate_time_on()
-            lampOnTime = lamp.calculate_time_on()
+            pumpOnTime = pump.get_interval_seconds_on()
+            lampOnTime = lamp.get_interval_seconds_on()
             moisture = data.moistureArray.getAvg()
             kwh = measurePowerConsumption(
                 pumpOnTime, lampOnTime)
