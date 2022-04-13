@@ -1,7 +1,6 @@
 # Third Party
 import time
 import logging
-import sleep
 from datetime import datetime
 from serial import Serial
 
@@ -22,12 +21,6 @@ from classes.float import FloatSensor
 
 logging.basicConfig(level=logging.DEBUG)
 
-board = Serial(
-    port = '/dev/ttyACM0',
-    baudrate = 115200,
-    timeout = None,
-)
-
 def connect_to_board() -> Serial:
     """Connects to board for ACM0-ACM4"""
     board = None
@@ -45,7 +38,6 @@ def connect_to_board() -> Serial:
             logging.error(" Failed to connect to board: %s",
                 error)
             value += 1
-            sleep(2)
     return board
 
 # Data comes in as temperature,humidity,moisture,timeLightOn,floatSensor
