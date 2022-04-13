@@ -6,20 +6,31 @@ import logging
 from controllers.database import Database, SensorData, new_data_object
 from controllers.powerConsumption import measurePowerConsumption
 from controllers.waterConsumption import measureWaterConsumption
+from classes.data import Data
+from classes.peripheral import Lamp, Pump
 
-def checkIfDataNeedsSent(lastMinuteSent, temp, hum, moisture, lightOnTimeSecs, pumpOnTimeSecs, timestamp, envId, db) -> datetime.minute:
+
+def checkIfDataNeedsSent(lastMinuteSent, data:Data, lamp:Lamp,
+        pump:Pump, timestamp, envId, db) -> datetime.minute:
     """If the time is right (every 15 minutes), calls send_data"""
     minutesToSendOn = [0, 15, 30, 45]
     now = datetime.now()
     minute = now.minute
     if minute in minutesToSendOn:
         if minute != lastMinuteSent:
-            kwh = measurePowerConsumption(pumpOnTimeSecs, lightOnTimeSecs)
-            ml = measureWaterConsumption(pumpOnTimeSecs)
-            data = f'{envId},{timestamp},{lightOnTimeSecs},{ml},{kwh},{hum},{moisture},{temp}'
+            pumpOnTime = pump.calculate_time_on()
+            lampOnTime = lamp.calculate_time_on()
+            moisture = data.moistureArray.getAvg()
+            kwh = measurePowerConsumption(
+                pumpOnTime, lampOnTime)
+            ml = measureWaterConsumption(
+                pumpOnTime)
+            data_string = (f"{envId},{timestamp},{lampOnTime},"
+                f"{ml},{kwh},{data.humidity},{moisture},"
+                f"{data.temperature}")
             logging.debug(" Sending data string: \n\t%s",
-                data)
-            send_data(data, db)
+                data_string)
+            send_data(data_string, db)
             lastMinuteSent = minute
     return lastMinuteSent
 
@@ -40,8 +51,3 @@ def send_data(data:str, db:Database) -> bool:
             error)
         return 0
     return 1
-
-if __name__ == '__main__':
-    incoming = '0,2021-04-22 02:22:22,2,4,100,10,3'
-    result = send_data(incoming, Database())
-    assert result, "Failed to send data."

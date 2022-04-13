@@ -1,16 +1,17 @@
 # Third Party
-from datetime import datetime
-import serial
 import time
 import logging
+from datetime import datetime
+from serial import Serial
 
 # Proprietary
 from controllers.sendEmail import notifyLowWater, notifyWaterFilled
 from controllers.sendData import checkIfDataNeedsSent
 from controllers.signalArduino import determineSignalToSend
-from controllers.dataArray import DataArray
 from controllers.database import Database
-from classes import FloatSensor, Peripheral
+from classes.data import Data
+from classes.peripheral import Lamp, Pump
+from classes.float import FloatSensor
 
 
 logging.basicConfig(level=logging.ERROR,
@@ -18,30 +19,30 @@ logging.basicConfig(level=logging.ERROR,
     filename="error_log.log",
 )
 
-board = serial.Serial(
+board = Serial(
     port = '/dev/ttyACM0',
     baudrate = 115200,
     timeout = None,
 )
 
 # Data comes in as temperature,humidity,moisture,timeLightOn,floatSensor
-temp = 0
-hum = 0
-moisture = 0
-
 thrash_flag = True
 
-lightArray = DataArray(101, 20)
-moistureArray = DataArray(450, 5)
-
-light_fixt = Peripheral(name="Light", critical_value=100)
-pump = Peripheral(name="Pump", critical_value=400)
+light_crit_val = 100
+moist_crit_val = 400
 
 floatFlag = FloatSensor()
+lamp = Lamp(critical_value=light_crit_val)
+pump = Pump(critical_value=moist_crit_val)
+data = Data(
+    light_critical_value=light_crit_val,
+    moisture_critical_value=moist_crit_val
+)
+
 emailSent = False
 emailTimestamp = 0
 
-timeDataCollected = 0
+timestamp = None
 lastMinuteSent = 1
 envId = 1
 signalSentBool = False
@@ -51,7 +52,7 @@ db = Database()
 def checkIfEmailNeeded(floatFlag:FloatSensor, emailTimestamp):
     global emailSent
     currentTime = time.time()
-    if(currentTime - emailTimestamp > 86400):#86400 seconds in 24 hours
+    if currentTime - emailTimestamp > 86400:#86400 seconds in 24 hours
         emailSent = False
     if not floatFlag.flag and not emailSent:
         notifyLowWater(currentTime)
@@ -65,30 +66,33 @@ def checkIfEmailNeeded(floatFlag:FloatSensor, emailTimestamp):
 while True:
     try:
         while board.inWaiting() == 0:
-            if temp == 0 or temp == -999 or moisture == 0:
+            if not data.valid:
                 continue
             # emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
-            returned = checkIfDataNeedsSent(lastMinuteSent, temp, hum, moistureArray.getAvg(),
-                light_fixt.calculate_time_on(), pump.calculate_time_on(), timeDataCollected,
-                envId, db)
+            returned = checkIfDataNeedsSent(lastMinuteSent,
+                data, lamp,
+                pump, timestamp, envId, db)
             if returned != lastMinuteSent:
                 lastMinuteSent = returned
             if thrash_flag:
-                light_fixt.light_evaluate_need(lightArray.getAvg())
-                pump.pump_evaluate_need(moistureArray.getAvg(),
+                lamp.evaluate_need(
+                    data.lightArray.getAvg())
+                pump.evaluate_need(
+                    data.moistureArray.getAvg(),
                     flag=floatFlag.flag)
                 thrash_flag = False
             if not signalSentBool:
-                determineSignalToSend(pump.is_on, light_fixt.is_on, board)
+                determineSignalToSend(pump.is_on, lamp.is_on, board)
                 signalSentBool = True
-        timeDataCollected = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+        timestamp = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         output = board.readline().decode('utf-8').strip().split(',')
         if len(output) == 6:
-            temp = output[0]
-            hum = output[1]
-            moisture = int (output[2])
-            moistureArray.add(moisture)
-            lightArray.add(output[3])
+            data.update(
+                temperature=int(output[0]),
+                humidity=int(output[1]),
+                moisture=int(output[2]),
+                light=int(output[3])
+            )
             if 'LOW' in output[4]:
                 floatFlag.set_low()
             else:
@@ -97,9 +101,11 @@ while True:
             signalSentBool = False
             print(output)
         else:
-            logging.error(" Incomplete board output: %s", output)
+            logging.error(" Incomplete board output: %s",
+                output)
             continue
     except Exception as error:
-        logging.error(" Error reading board: %s", error)
+        logging.error(" Error reading board: %s",
+            error)
     finally:
         determineSignalToSend(False, False, board)
