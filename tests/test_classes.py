@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 
 from classes.data import Data
 from classes.peripheral import Lamp, Pump
+from controllers.signalArduino import determineSignalToSend
+from classes.board_test import Board
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -204,3 +206,25 @@ def test_data_class_array_updates():
         data.lightArray.data)
     assert data.moistureArray.getAvg() == 340
     assert data.lightArray.getAvg() == 115
+
+def test_send_signal_arduino():
+    """Tests the determineSignalToSend function"""
+    both_on = 'A'
+    pump_on = 'C'
+    lamp_on = 'D'
+    both_off = 'B'
+    lamp = Lamp(is_on=True)
+    pump = Pump(is_on=True)
+    board = Board()
+    determineSignalToSend(pump.is_on, lamp.is_on, board)
+    assert board.signal == both_on
+    lamp.is_on = False
+    determineSignalToSend(pump.is_on, lamp.is_on, board)
+    assert board.signal == pump_on
+    lamp.is_on = True
+    pump.is_on = False
+    determineSignalToSend(pump.is_on, lamp.is_on, board)
+    assert board.signal == lamp_on
+    lamp.is_on = False
+    determineSignalToSend(pump.is_on, lamp.is_on, board)
+    assert board.signal == both_off
