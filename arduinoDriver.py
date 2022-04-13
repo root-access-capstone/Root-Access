@@ -99,7 +99,6 @@ while True:
                 floatFlag.set_high()
             thrash_flag = True
             signalSentBool = False
-            print(output)
         else:
             logging.error(" Incomplete board output: %s",
                 output)
