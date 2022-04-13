@@ -63,48 +63,49 @@ def checkIfEmailNeeded(floatFlag:FloatSensor, emailTimestamp):
         emailSent = False
     return emailTimestamp
 
-while True:
-    try:
-        while board.inWaiting() == 0:
-            if not data.valid:
-                continue
-            # emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
-            returned = checkIfDataNeedsSent(lastMinuteSent,
-                data, lamp,
-                pump, timestamp, envId, db)
-            if returned != lastMinuteSent:
-                lastMinuteSent = returned
-            if thrash_flag:
-                lamp.evaluate_need(
-                    data.lightArray.getAvg())
-                pump.evaluate_need(
-                    data.moistureArray.getAvg(),
-                    flag=floatFlag.flag)
-                thrash_flag = False
-            if not signalSentBool:
-                determineSignalToSend(pump.is_on, lamp.is_on, board)
-                signalSentBool = True
-        timestamp = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-        output = board.readline().decode('utf-8').strip().split(',')
-        if len(output) == 6:
-            data.update(
-                temperature=int(output[0]),
-                humidity=int(output[1]),
-                moisture=int(output[2]),
-                light=int(output[3])
-            )
-            if 'LOW' in output[4]:
-                floatFlag.set_low()
+try:
+    while True:
+        try:
+            while board.inWaiting() == 0:
+                if not data.valid:
+                    continue
+                # emailTimestamp = checkIfEmailNeeded(floatFlag, emailTimestamp)
+                returned = checkIfDataNeedsSent(lastMinuteSent,
+                    data, lamp,
+                    pump, timestamp, envId, db)
+                if returned != lastMinuteSent:
+                    lastMinuteSent = returned
+                if thrash_flag:
+                    lamp.evaluate_need(
+                        data.lightArray.getAvg())
+                    pump.evaluate_need(
+                        data.moistureArray.getAvg(),
+                        flag=floatFlag.flag)
+                    thrash_flag = False
+                if not signalSentBool:
+                    determineSignalToSend(pump.is_on, lamp.is_on, board)
+                    signalSentBool = True
+            timestamp = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+            output = board.readline().decode('utf-8').strip().split(',')
+            if len(output) == 6:
+                data.update(
+                    temperature=int(output[0]),
+                    humidity=int(output[1]),
+                    moisture=int(output[2]),
+                    light=int(output[3])
+                )
+                if 'LOW' in output[4]:
+                    floatFlag.set_low()
+                else:
+                    floatFlag.set_high()
+                thrash_flag = True
+                signalSentBool = False
             else:
-                floatFlag.set_high()
-            thrash_flag = True
-            signalSentBool = False
-        else:
-            logging.error(" Incomplete board output: %s",
-                output)
-            continue
-    except Exception as error:
-        logging.error(" Error reading board: %s",
-            error)
-    finally:
-        determineSignalToSend(False, False, board)
+                logging.error(" Incomplete board output: %s",
+                    output)
+                continue
+        except Exception as error:
+            logging.error(" Error reading board: %s",
+                error)
+finally:
+    determineSignalToSend(False, False, board)
