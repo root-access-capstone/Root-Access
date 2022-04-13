@@ -1,6 +1,7 @@
 # Third Party
 import time
 import logging
+import sleep
 from datetime import datetime
 from serial import Serial
 
@@ -14,16 +15,38 @@ from classes.peripheral import Lamp, Pump
 from classes.float import FloatSensor
 
 
-logging.basicConfig(level=logging.ERROR,
-    filemode="w",
-    filename="error_log.log",
-)
+# logging.basicConfig(level=logging.ERROR,
+#     filemode="w",
+#     filename="error_log.log",
+# )
+
+logging.basicConfig(level=logging.DEBUG)
 
 board = Serial(
     port = '/dev/ttyACM0',
     baudrate = 115200,
     timeout = None,
 )
+
+def connect_to_board() -> Serial:
+    """Connects to board for ACM0-ACM4"""
+    board = None
+    value = 0
+    while not board:
+        try:
+            board = Serial(
+                port=("/dev/ttyACM"+str(value)),
+                baudrate=115200,
+                timeout=None, )
+            # Method call to check connection
+            # or find error :)
+            board.in_waiting()
+        except Exception as error:
+            logging.error(" Failed to connect to board: %s",
+                error)
+            value += 1
+            sleep(2)
+    return board
 
 # Data comes in as temperature,humidity,moisture,timeLightOn,floatSensor
 thrash_flag = True
@@ -48,6 +71,7 @@ envId = 1
 signalSentBool = False
 
 db = Database()
+board = connect_to_board()
 
 def checkIfEmailNeeded(floatFlag:FloatSensor, emailTimestamp):
     global emailSent
@@ -107,5 +131,6 @@ try:
         except Exception as error:
             logging.error(" Error reading board: %s",
                 error)
+            board = connect_to_board()
 finally:
     determineSignalToSend(False, False, board)
