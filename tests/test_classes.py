@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 
 from classes.data import Data
 from classes.peripheral import Lamp, Pump
-from controllers.signalArduino import determineSignalToSend
 from classes.board_test import Board
+from controllers.signalArduino import determineSignalToSend
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -157,7 +157,7 @@ def test_calc_time_thrice_same_interval():
 
 def test_calc_time_off_across_two_intervals():
     """Tests the the Lamp's calculate_time_on method
-    when turned on last interval"""
+    when turned on last interval & off this interval"""
     now = datetime(2022,4,11,9,21,56)
     interval_time = now + timedelta(minutes=8)
     twenty_mins_later = now + timedelta(minutes=20)
@@ -170,6 +170,118 @@ def test_calc_time_off_across_two_intervals():
     lamp.set_off(twenty_mins_later)
     assert lamp.get_interval_seconds_on(next_interval_time) == eleven_mins_seconds
     logging.debug(" Lamp after second round: \n%s", lamp)
+
+def test_calc_time_off_across_three_intervals():
+    """Tests the the Lamp's calculate_time_on method
+    when turned on two intervals ago & off this interval"""
+    now = datetime(2022,4,11,9,21,56)
+    interval_time = now + timedelta(minutes=8)
+    next_interval_time = now + timedelta(minutes=23)
+    thirty_four_mins_later = now + timedelta(minutes=34)
+    last_interval_time = now + timedelta(minutes=38)
+    eight_mins_seconds = 8 * 60
+    ten_mins_seconds = 10 * 60
+    fifteen_mins_seconds = 15 * 60
+    lamp = Lamp(is_on=True, time_turned_on=now)
+    assert lamp.get_interval_seconds_on(interval_time) == eight_mins_seconds
+    logging.debug(" Lamp after first round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(next_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after second round: \n%s", lamp)
+    lamp.set_off(thirty_four_mins_later)
+    assert lamp.get_interval_seconds_on(last_interval_time) == ten_mins_seconds
+    logging.debug(" Lamp after final round: \n%s", lamp)
+
+def test_calc_time_off_across_four_intervals():
+    """Tests the the Lamp's calculate_time_on method
+    when turned on three intervals ago & off this interval"""
+    now = datetime(2022,4,11,9,21,56)
+    interval_time = now + timedelta(minutes=8)
+    second_interval_time = now + timedelta(minutes=23)
+    third_interval_time = now + timedelta(minutes=38)
+    fourty_nine_minutes_later = now + timedelta(minutes=49)
+    last_interval_time = now + timedelta(minutes=53)
+    eight_mins_seconds = 8 * 60
+    ten_mins_seconds = 10 * 60
+    fifteen_mins_seconds = 15 * 60
+    lamp = Lamp(is_on=True, time_turned_on=now)
+    assert lamp.get_interval_seconds_on(interval_time) == eight_mins_seconds
+    logging.debug(" Lamp after first round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(second_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after second round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(third_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after third round: \n%s", lamp)
+    lamp.set_off(fourty_nine_minutes_later)
+    assert lamp.get_interval_seconds_on(last_interval_time) == ten_mins_seconds
+    logging.debug(" Lamp after final round: \n%s", lamp)
+
+def test_calc_time_off_across_five_intervals():
+    """Tests the the Lamp's calculate_time_on method
+    when turned on four intervals ago & off this interval"""
+    now = datetime(2022,4,11,9,21,56)
+    interval_time = now + timedelta(minutes=8)
+    second_interval_time = now + timedelta(minutes=23)
+    third_interval_time = now + timedelta(minutes=38)
+    fourth_interval_time = now + timedelta(minutes=53)
+    fourty_nine_minutes_later = now + timedelta(minutes=64)
+    last_interval_time = now + timedelta(minutes=68)
+    eight_mins_seconds = 8 * 60
+    ten_mins_seconds = 10 * 60
+    fifteen_mins_seconds = 15 * 60
+    lamp = Lamp(is_on=True, time_turned_on=now)
+    assert lamp.get_interval_seconds_on(interval_time) == eight_mins_seconds
+    logging.debug(" Lamp after first round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(second_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after second round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(third_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after third round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(fourth_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after final round: \n%s", lamp)
+    lamp.set_off(fourty_nine_minutes_later)
+    assert lamp.get_interval_seconds_on(last_interval_time) == ten_mins_seconds
+    logging.debug(" Lamp after final round: \n%s", lamp)
+
+def test_calc_time_on_across_four_intervals():
+    """Tests the the Lamp's calculate_time_on method
+    when turned on three intervals ago & still on"""
+    now = datetime(2022,4,11,9,21,56)
+    interval_time = now + timedelta(minutes=8)
+    second_interval_time = now + timedelta(minutes=23)
+    third_interval_time = now + timedelta(minutes=38)
+    last_interval_time = now + timedelta(minutes=53)
+    eight_mins_seconds = 8 * 60
+    fifteen_mins_seconds = 15 * 60
+    lamp = Lamp(is_on=True, time_turned_on=now)
+    assert lamp.get_interval_seconds_on(interval_time) == eight_mins_seconds
+    logging.debug(" Lamp after first round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(second_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after second round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(third_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after third round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(last_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after final round: \n%s", lamp)
+
+def test_calc_time_on_across_five_intervals():
+    """Tests the the Lamp's calculate_time_on method
+    when turned on four intervals ago & still on"""
+    now = datetime(2022,4,11,9,21,56)
+    interval_time = now + timedelta(minutes=8)
+    second_interval_time = now + timedelta(minutes=23)
+    third_interval_time = now + timedelta(minutes=38)
+    fourth_interval_time = now + timedelta(minutes=53)
+    last_interval_time = now + timedelta(minutes=68)
+    eight_mins_seconds = 8 * 60
+    fifteen_mins_seconds = 15 * 60
+    lamp = Lamp(is_on=True, time_turned_on=now)
+    assert lamp.get_interval_seconds_on(interval_time) == eight_mins_seconds
+    logging.debug(" Lamp after first round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(second_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after second round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(third_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after third round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(fourth_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after fourth round: \n%s", lamp)
+    assert lamp.get_interval_seconds_on(last_interval_time) == fifteen_mins_seconds
+    logging.debug(" Lamp after final round: \n%s", lamp)
 
 def test_calc_time_off_never_on():
     """Tests the the Lamp's calculate_time_on method
@@ -228,3 +340,6 @@ def test_send_signal_arduino():
     lamp.is_on = False
     determineSignalToSend(pump.is_on, lamp.is_on, board)
     assert board.signal == both_off
+
+if __name__ == "__main__":
+    test_calc_time_off_across_five_intervals()
