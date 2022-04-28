@@ -115,7 +115,8 @@ class Peripheral(ABC):
             now = datetime.now()
         # Intervals are every time we store data
         if self.is_on:
-            if self.time_turned_on.minute//15 == now.minute//15:
+            if (self.time_turned_on.minute//15 == now.minute//15 and
+                    self.time_turned_on.hour == now.hour):
                 # Turned on this interval, still on
                 time_difference = now - self.time_turned_on
                 logging.debug(" Turned on this interval, storing for roughly %s minutes",
@@ -128,7 +129,8 @@ class Peripheral(ABC):
                     time_difference)
                 self.interval_seconds_on += time_difference.seconds
         elif self.time_turned_off and self.time_turned_off >= (now - timedelta(minutes=15)):
-            if self.time_turned_off.minute//15 == self.time_turned_on.minute//15:
+            if (self.time_turned_off.minute//15 == self.time_turned_on.minute//15 and
+                    self.time_turned_off.hour == self.time_turned_on.hour):
                 # Turned on & off this interval
                 time_difference = self.time_turned_off - self.time_turned_on
                 logging.debug(" Turned off this interval, storing for roughly %s minutes",
